@@ -12,7 +12,7 @@ const SignUpBox = () => {
         <span className="font-semibold mb-1">ID</span>
         <input
           type="text"
-          name="userName"
+          name="username"
           value={formData.username}
           onChange={handleChange}
           required
@@ -48,7 +48,7 @@ const SignUpBox = () => {
         <span className="font-semibold mb-1">Nickname</span>
         <input
           type="text"
-          name="nickName"
+          name="nickname"
           value={formData.nickname}
           onChange={handleChange}
           required
