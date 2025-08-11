@@ -27,9 +27,9 @@ jobs:
 
     - name: Debug secrets
       run: |
-      echo "HOST: ${{ secrets.SERVER_HOST }}"
-      echo "PORT: ${{ secrets.SERVER_PORT }}"
-      echo "USER: ${{ secrets.SERVER_USERNAME }}"
+        echo "HOST: ${{ secrets.SERVER_HOST }}"
+        echo "PORT: ${{ secrets.SERVER_PORT }}"
+        echo "USER: ${{ secrets.SERVER_USERNAME }}"
     
     - name: Deploy to server via SSH
       uses: appleboy/ssh-action@v1.0.3
