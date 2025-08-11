@@ -31,9 +31,6 @@ declare module 'slate' {
     }
 }
 
-// 헬퍼 함수들
-const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify']
-const LIST_TYPES = ['numbered-list', 'bulleted-list']
 
 const isBlockActive = (editor: Editor, format: string, blockType = 'type') => {
     const { selection } = editor
