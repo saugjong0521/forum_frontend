@@ -38,13 +38,14 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         password: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_PORT }}
+        timeout: 60s
         script: |
-         cd /home/frontend/over101/forum_frontend
-         git pull origin main
-         npm ci
-         npm run build
-         pm2 restart forum_frontend
-         echo "Deployment completed at $(date)" >> /home/frontend/over101/forum_frontend/deployment.log
+          cd /home/frontend/over101/forum_frontend
+          git pull origin main
+          npm ci
+          npm run build
+          pm2 restart forum_frontend
+          echo "Deployment completed at $(date)" >> /home/frontend/over101/forum_frontend/deployment.log
 
     - name: Notify deployment status (optional)
       if: always()
