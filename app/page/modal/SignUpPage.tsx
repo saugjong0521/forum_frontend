@@ -1,3 +1,4 @@
+
 import SignUpBox from "@/app/components/SignUpBox";
 import React from "react";
 

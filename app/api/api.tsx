@@ -1,4 +1,5 @@
-// api.ts
+'use client'
+
 import axios from 'axios';
 
 const api = axios.create({
