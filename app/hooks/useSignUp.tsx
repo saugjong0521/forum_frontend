@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from "react";
 import { api } from "../api"; // axios 인스턴스
 import { SignData } from "../types/sign"; // 타입 import
