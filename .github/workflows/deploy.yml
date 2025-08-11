@@ -24,6 +24,12 @@ jobs:
     
     - name: Build project
       run: npm run build
+
+    - name: Debug secrets
+      run: |
+      echo "HOST: ${{ secrets.SERVER_HOST }}"
+      echo "PORT: ${{ secrets.SERVER_PORT }}"
+      echo "USER: ${{ secrets.SERVER_USERNAME }}"
     
     - name: Deploy to server via SSH
       uses: appleboy/ssh-action@v1.0.3
@@ -33,12 +39,12 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_PORT }}
         script: |
-          cd /home/frontend/over101/forum_frontend
-          git pull origin main
-          npm ci
-          npm run build
-          pm2 restart forum_frontend
-          echo "Deployment completed at $(date)" >> /home/frontend/over101/forum_frontend/deployment.log
+         cd /home/frontend/over101/forum_frontend
+         git pull origin main
+         npm ci
+         npm run build
+         pm2 restart forum_frontend
+         echo "Deployment completed at $(date)" >> /home/frontend/over101/forum_frontend/deployment.log
 
     - name: Notify deployment status (optional)
       if: always()
