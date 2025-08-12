@@ -9,50 +9,58 @@ const SignUpBox = () => {
   return (
     <form className="flex flex-col gap-4 w-full max-w-md" onSubmit={handleSubmit}>
       <label className="flex flex-col">
-        <span className="font-semibold mb-1">ID</span>
+        <span className="font-semibold mb-1">
+          <p className=" text-[#000]">ID</p>
+        </span>
         <input
           type="text"
           name="username"
           value={formData.username}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border border-[#000] text-[#000] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </label>
 
       <label className="flex flex-col">
-        <span className="font-semibold mb-1">Email</span>
+        <span className="font-semibold mb-1">
+          <p className=" text-[#000]">Email</p>
+        </span>
         <input
           type="email"
           name="email"
           value={formData.email}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border border-[#000] text-[#000] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </label>
 
       <label className="flex flex-col">
-        <span className="font-semibold mb-1">Password</span>
+        <span className="font-semibold mb-1">
+          <p className=" text-[#000]">Password</p>
+        </span>
         <input
           type="password"
           name="password"
           value={formData.password}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border border-[#000] text-[#000] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </label>
 
       <label className="flex flex-col">
-        <span className="font-semibold mb-1">Nickname</span>
+        <span className="font-semibold mb-1">
+          <p className=" text-[#000]">Nickname</p>
+        </span>
         <input
           type="text"
           name="nickname"
           value={formData.nickname}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border border-[#000] text-[#000] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </label>
 

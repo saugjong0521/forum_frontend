@@ -1,14 +1,12 @@
 
-import EditorPage from "./page/EditorPage";
-import SignUpPage from "./page/modal/SignUpPage";
+import MainPage from "./page/MainPage";
 
 export default function Home() {
 
 
   return (
     <>
-      <SignUpPage/>
-      <EditorPage />
+      <MainPage />
     </>
   );
 }
