@@ -18,15 +18,18 @@ const useSignIn = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+
     const setToken = useSessionTokenStore((state) => state.setToken)
+    const clearToken = useSessionTokenStore((state) => state.clearToken)
     const setUserInfo = useSessionUserStore((state) => state.setUserInfo)
+    const clearUserInfo = useSessionUserStore((state) => state.clearUserInfo)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
@@ -62,8 +65,7 @@ const useSignIn = () => {
                     },
                 });
 
-                const userInfo = userRes.data;
-                setUserInfo(userInfo);
+                setUserInfo(userRes.data);
                 setSuccess(true);
             }
         } catch (err: any) {
@@ -73,10 +75,17 @@ const useSignIn = () => {
         }
     };
 
+    const handleSignOut = () => {
+        clearToken();
+        clearUserInfo();
+        setSuccess(false);
+    };
+
     return {
         formData,
         handleChange,
-        handleSubmit,
+        handleSignIn,
+        handleSignOut,
         loading,
         error,
         success,

@@ -10,7 +10,7 @@ const AuthPanel = () => {
   const { nickname, email } = useSessionUserStore();
   const { token } = useSessionTokenStore();
 
-  const isLoggedIn = Boolean(token) || Boolean(nickname || email);
+  const isLoggedIn = Boolean(token)
 
   return isLoggedIn ? <UserInfoBox /> : <SignInBox />;
 };

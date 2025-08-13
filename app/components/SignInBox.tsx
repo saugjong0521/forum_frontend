@@ -3,10 +3,10 @@
 import { useSignIn } from "../hooks/useSignIn";
 
 const SignInBox = () => {
-    const { formData, handleChange, handleSubmit, loading, error, success } = useSignIn();
+    const { formData, handleChange, handleSignIn, loading, error, success } = useSignIn();
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+        <form onSubmit={handleSignIn} className="flex flex-col gap-4 w-full">
             <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-gray-700">아이디</label>
                 <input
