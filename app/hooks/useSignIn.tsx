@@ -35,7 +35,18 @@ const useSignIn = () => {
 
         try {
             const { username, password } = formData;
-            const res = await api.post(PATH.SIGNIN, { username, password });
+
+            // URLSearchParams를 이용하여 x-www-form-urlencoded 생성
+            const body = new URLSearchParams();
+            body.append('username', username);
+            body.append('password', password);
+
+            const res = await api.post(PATH.SIGNIN, body.toString(), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            });
+
             const sessionToken = res.data?.access_token;
 
             if (sessionToken) {
@@ -60,6 +71,7 @@ const useSignIn = () => {
             setLoading(false);
         }
     };
+
 
     return {
         formData,
