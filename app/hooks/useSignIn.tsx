@@ -4,6 +4,8 @@ import { useState } from "react"
 import { SignData } from "../types/sign"
 import { api } from "../api";
 import { PATH } from "../constants/path";
+import { useSessionTokenStore } from "../store/useSessionTokenStore";
+import { useSessionUserStore } from "../store/useUserInfoStore";
 
 
 const useSignIn = () => {
@@ -17,6 +19,8 @@ const useSignIn = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+    const setToken = useSessionTokenStore((state) => state.setToken)
+    const setUserInfo = useSessionUserStore((state) => state.setUserInfo)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -31,9 +35,25 @@ const useSignIn = () => {
 
         try {
             const { username, password } = formData;
-            await api.post(PATH.SIGNIN, { username, password });
-            setSuccess(true);
-            setFormData({ username: "", password: "", email: "", nickname: "" });
+            const res = await api.post(PATH.SIGNIN, { username, password });
+            const sessionToken = res.data?.access_token;
+
+            if (sessionToken) {
+                setToken(sessionToken);
+
+                // Bearer 토큰 포함하여 사용자 정보 요청
+                const userRes = await api.get(PATH.USERINFO, {
+                    headers: {
+                        Authorization: `Bearer ${sessionToken}`,
+                    },
+                });
+
+                const userInfo = userRes.data;
+
+                // Zustand store에 사용자 정보 저장
+                setUserInfo(userInfo);
+                setSuccess(true);
+            }
         } catch (err: any) {
             setError(err.response?.data?.message || "로그인에 실패했습니다.");
         } finally {
