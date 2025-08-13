@@ -1,5 +1,5 @@
 import Link from "next/link";
-import SignInBox from "../components/SignInBox";
+import AuthPanel from "../components/AuthPanel";
 
 const MainPage = () => {
     return (
@@ -26,7 +26,7 @@ const MainPage = () => {
                 
                 
                 <div className="w-full flex-2 bg-[#fff] rounded-lg p-4 flex items-center justify-center">
-                    <SignInBox />
+                    <AuthPanel />
                 </div>
                 
                 

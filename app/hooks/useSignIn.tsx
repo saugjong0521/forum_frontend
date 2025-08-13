@@ -7,7 +7,6 @@ import { PATH } from "../constants/path";
 import { useSessionTokenStore } from "../store/useSessionTokenStore";
 import { useSessionUserStore } from "../store/useUserInfoStore";
 
-
 const useSignIn = () => {
     const [formData, setFormData] = useState<SignData>({
         username: '',
@@ -36,10 +35,14 @@ const useSignIn = () => {
         try {
             const { username, password } = formData;
 
-            // URLSearchParams를 이용하여 x-www-form-urlencoded 생성
+            // x-www-form-urlencoded body 생성
             const body = new URLSearchParams();
+            body.append('grant_type', '');
             body.append('username', username);
             body.append('password', password);
+            body.append('scope', '');
+            body.append('client_id', '');
+            body.append('client_secret', '');
 
             const res = await api.post(PATH.SIGNIN, body.toString(), {
                 headers: {
@@ -52,7 +55,7 @@ const useSignIn = () => {
             if (sessionToken) {
                 setToken(sessionToken);
 
-                // Bearer 토큰 포함하여 사용자 정보 요청
+                // 사용자 정보 요청
                 const userRes = await api.get(PATH.USERINFO, {
                     headers: {
                         Authorization: `Bearer ${sessionToken}`,
@@ -60,8 +63,6 @@ const useSignIn = () => {
                 });
 
                 const userInfo = userRes.data;
-
-                // Zustand store에 사용자 정보 저장
                 setUserInfo(userInfo);
                 setSuccess(true);
             }
@@ -71,7 +72,6 @@ const useSignIn = () => {
             setLoading(false);
         }
     };
-
 
     return {
         formData,
