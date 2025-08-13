@@ -1,3 +1,4 @@
+
 // page.tsx 또는 다른 컴포넌트에서
 
 import SlateTextEditor from "../../components/SlateTextEditor";
