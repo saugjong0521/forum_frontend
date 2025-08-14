@@ -112,17 +112,12 @@ export default function PostWriteBox() {
                         />
                     </div>
 
-                    {/* 닉네임 입력 */}
+                    {/* 닉네임 표시 */}
                     <div className="flex w-full items-center gap-[20px] px-4">
                         <p className="text-[#fff] w-[180px] bg-[#aaa] h-full items-center flex p-2">닉네임</p>
-                        <input 
-                            type="text"
-                            value={nickname}
-                            onChange={(e) => setNickname(e.target.value)}
-                            placeholder="닉네임을 입력하세요"
-                            className="w-full border-gray-300 border text-[#000] p-2 rounded"
-                            disabled
-                        >{username}</input>
+                        <div className="w-full border-gray-300 border text-[#000] p-2 rounded bg-gray-100">
+                            {username || '로그인이 필요합니다'}
+                        </div>
                     </div>
 
                     {/* 비밀번호 입력 */}
