@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSessionTokenStore } from '../store/useSessionTokenStore';
 import { PATH } from '../constants/path';
 import { api } from '../api';
 
@@ -28,7 +27,6 @@ export const useBringPost = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { token } = useSessionTokenStore();
 
   const bringPosts = async (params: GetPostsParams = {}): Promise<Post[] | null> => {
     setLoading(true);
@@ -43,9 +41,6 @@ export const useBringPost = () => {
     try {
       const response = await api.get(PATH.GETPOST, {
         params: queryParams,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       setPosts(response.data);

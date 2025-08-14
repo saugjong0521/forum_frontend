@@ -4,6 +4,7 @@ export const PATH = {
   SIGNIN: "/auth/login",
   USERINFO: "/auth/me",
   UPLOADPOST: "/posts",
+  GETPOST: "/posts"
 } as const;
 
 
