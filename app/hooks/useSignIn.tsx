@@ -5,7 +5,7 @@ import { SignData } from "../types/sign"
 import { api } from "../api";
 import { PATH } from "../constants/path";
 import { useSessionTokenStore } from "../store/useSessionTokenStore";
-import { useSessionUserStore } from "../store/useUserInfoStore";
+import { useUserInfoStore } from "../store/useUserInfoStore";
 
 const useSignIn = () => {
     const [formData, setFormData] = useState<SignData>({
@@ -21,8 +21,8 @@ const useSignIn = () => {
 
     const setToken = useSessionTokenStore((state) => state.setToken)
     const clearToken = useSessionTokenStore((state) => state.clearToken)
-    const setUserInfo = useSessionUserStore((state) => state.setUserInfo)
-    const clearUserInfo = useSessionUserStore((state) => state.clearUserInfo)
+    const setUserInfo = useUserInfoStore((state) => state.setUserInfo)
+    const clearUserInfo = useUserInfoStore((state) => state.clearUserInfo)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;

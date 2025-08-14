@@ -1,11 +1,11 @@
 'use client'
 
 import React from "react";
-import { useSessionUserStore } from "../store/useUserInfoStore";
+import { useUserInfoStore } from "../store/useUserInfoStore";
 import { useSignIn } from "../hooks/useSignIn";
 
 const UserInfoBox = () => {
-    const { nickname, email } = useSessionUserStore();
+    const { nickname, email } = useUserInfoStore();
     const { handleSignOut } = useSignIn();
 
     return (

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react'
+import React, { useCallback, useMemo, useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react'
 import { createEditor, Descendant, Editor, Element as SlateElement, Transforms, Text, BaseEditor, Path, Node } from 'slate'
 import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, ReactEditor, useSlate } from 'slate-react'
 import { withHistory } from 'slate-history'
@@ -23,6 +23,12 @@ type CustomText = {
     color?: string
 }
 
+// ✅ 부모 컴포넌트에서 HTML을 가져올 수 있는 ref 타입
+export interface SlateTextEditorRef {
+    getHTML: () => string;
+    clear: () => void;
+}
+
 declare module 'slate' {
     interface CustomTypes {
         Editor: BaseEditor & ReactEditor
@@ -31,7 +37,7 @@ declare module 'slate' {
     }
 }
 
-// ✅ 개선 1: 함수 최적화 및 에러 핸들링
+// 기존 함수들 (동일하므로 생략하고 핵심만)
 const isBlockActive = (editor: Editor, format: string, blockType = 'type') => {
     const { selection } = editor
     if (!selection) return false
@@ -103,7 +109,6 @@ const getCurrentListItem = (editor: Editor) => {
     }
 }
 
-// ✅ 개선 2: 리스트 인덱스 계산 최적화
 const getListItemIndex = (editor: Editor, path: Path, level: number, listType: 'bulleted' | 'numbered'): number => {
     let index = 0
     const parentPath = Path.parent(path)
@@ -126,7 +131,6 @@ const getListItemIndex = (editor: Editor, path: Path, level: number, listType: '
     return index
 }
 
-// ✅ 개선 3: 더 다양한 리스트 마커
 const getListMarker = (listType: 'bulleted' | 'numbered', level: number, index: number) => {
     if (listType === 'bulleted') {
         const markers = ['•', '◦', '▪', '‣', '⁃']
@@ -171,7 +175,7 @@ const increaseListLevel = (editor: Editor) => {
     if (!currentItem) return
 
     const currentLevel = currentItem.level || 0
-    if (currentLevel < 4) { // ✅ 개선: 최대 5레벨로 확장
+    if (currentLevel < 4) {
         Transforms.setNodes(editor, {
             level: currentLevel + 1
         })
@@ -224,7 +228,7 @@ const toggleMark = (editor: Editor, format: keyof Omit<CustomText, 'text'>) => {
     }
 }
 
-// ✅ 개선 4: 메모화된 렌더링 컴포넌트
+// 렌더링 컴포넌트들 (기존과 동일)
 const Element = React.memo(({ attributes, children, element }: RenderElementProps) => {
     const style = { textAlign: (element as any).align }
 
@@ -324,7 +328,6 @@ const Element = React.memo(({ attributes, children, element }: RenderElementProp
     }
 })
 
-// ✅ 개선 5: 최적화된 리스트 아이템 컴포넌트
 const ListItemElement = React.memo<{
     attributes: any
     element: CustomElement
@@ -384,7 +387,6 @@ const ListItemElement = React.memo<{
     )
 })
 
-// ✅ 개선 6: 최적화된 Leaf 컴포넌트
 const Leaf = React.memo(({ attributes, children, leaf }: RenderLeafProps) => {
     let style: React.CSSProperties = {}
 
@@ -416,7 +418,6 @@ const Leaf = React.memo(({ attributes, children, leaf }: RenderLeafProps) => {
     return <span {...attributes} style={style}>{children}</span>
 })
 
-// ✅ 개선 7: 최적화된 툴바 버튼
 const ToolbarButton = React.memo<{
     format: string
     icon: string
@@ -465,8 +466,8 @@ const ToolbarButton = React.memo<{
     )
 })
 
-// ✅ 개선 8: 메인 에디터 컴포넌트 최적화
-const SlateTextEditor: React.FC = () => {
+// ✅ forwardRef로 ref 지원하는 메인 에디터 컴포넌트
+const SlateTextEditor = forwardRef<SlateTextEditorRef>((props, ref) => {
     const editor = useMemo(() => withHistory(withReact(createEditor())), [])
     const composingRef = useRef(false)
 
@@ -481,11 +482,21 @@ const SlateTextEditor: React.FC = () => {
     const [fontSize, setFontSize] = useState<number>(16)
     const [textColor, setTextColor] = useState<string>('#000000')
 
-    // ✅ 개선 9: 메모화된 렌더 함수들
+    // ✅ 부모 컴포넌트에서 HTML과 clear 함수에 접근할 수 있게 함
+    useImperativeHandle(ref, () => ({
+        getHTML: () => html,
+        clear: () => {
+            setValue([{
+                type: 'paragraph',
+                children: [{ text: '' }],
+            }])
+            setHtml('')
+        }
+    }))
+
     const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, [])
     const renderLeaf = useCallback((props: RenderLeafProps) => <Leaf {...props} />, [])
 
-    // ✅ 개선 10: 디바운싱된 HTML 업데이트
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setHtml(serializeToHTML(value))
@@ -516,7 +527,6 @@ const SlateTextEditor: React.FC = () => {
         }
     }, [editor])
 
-    // ✅ 개선 11: 향상된 키보드 핸들링
     const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
         if ((event.nativeEvent as any).isComposing) return
         if ((event.nativeEvent as any).keyCode === 229) return
@@ -560,7 +570,6 @@ const SlateTextEditor: React.FC = () => {
             }
         }
 
-        // ✅ 개선: Ctrl+A 전체 선택 지원
         if ((event.ctrlKey || event.metaKey)) {
             switch (event.key) {
                 case 'b':
@@ -610,7 +619,6 @@ const SlateTextEditor: React.FC = () => {
         applyTextColor(color)
     }, [applyTextColor])
 
-    // ✅ 개선 12: 더 안전한 HTML 직렬화
     const serializeToHTML = useCallback((nodes: Descendant[]): string => {
         try {
             return nodes
@@ -642,7 +650,6 @@ const SlateTextEditor: React.FC = () => {
         if (Text.isText(node)) {
             let text = node.text
 
-            // HTML 이스케이프
             text = text
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
@@ -694,7 +701,6 @@ const SlateTextEditor: React.FC = () => {
                     initialValue={value}
                     onChange={setValue}
                 >
-                    {/* ✅ 개선된 툴바 */}
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -782,14 +788,10 @@ const SlateTextEditor: React.FC = () => {
                     />
                 </Slate>
             </div>
-
-            {/*<div>
-                <h3>미리보기 (HTML 적용)</h3>
-                {html}
-            </div> */}
-
         </div>
     )
-}
+})
+
+SlateTextEditor.displayName = 'SlateTextEditor'
 
 export default SlateTextEditor

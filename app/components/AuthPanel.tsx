@@ -3,11 +3,11 @@
 import React from 'react';
 import SignInBox from '../components/SignInBox';
 import UserInfoBox from '../components/UserInfoBox';
-import { useSessionUserStore } from '../store/useUserInfoStore';
+import { useUserInfoStore } from '../store/useUserInfoStore';
 import { useSessionTokenStore } from '../store/useSessionTokenStore';
 
 const AuthPanel = () => {
-  const { nickname, email } = useSessionUserStore();
+  const { nickname, email } = useUserInfoStore();
   const { token } = useSessionTokenStore();
 
   const isLoggedIn = Boolean(token)

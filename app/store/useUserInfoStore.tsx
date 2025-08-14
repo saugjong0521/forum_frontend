@@ -10,7 +10,7 @@ interface UserInfoState {
   clearUserInfo: () => void;
 }
 
-const useSessionUserStore = create<UserInfoState>()(
+const useUserInfoStore = create<UserInfoState>()(
   persist(
     (set) => ({
       username: '',
@@ -27,4 +27,4 @@ const useSessionUserStore = create<UserInfoState>()(
   )
 );
 
-export { useSessionUserStore };
+export { useUserInfoStore };
