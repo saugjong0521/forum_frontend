@@ -17,7 +17,7 @@ const SignUpBox = () => {
           onChange={handleChange}
           placeholder="아이디를 입력하세요"
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-[#000]"
         />
       </div>
 
@@ -30,7 +30,7 @@ const SignUpBox = () => {
           onChange={handleChange}
           placeholder="이메일을 입력하세요"
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-[#000]"
         />
       </div>
 
@@ -43,7 +43,7 @@ const SignUpBox = () => {
           onChange={handleChange}
           placeholder="비밀번호를 입력하세요"
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-[#000]"
         />
       </div>
 
@@ -56,7 +56,7 @@ const SignUpBox = () => {
           onChange={handleChange}
           placeholder="닉네임을 입력하세요"
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-[#000]"
         />
       </div>
 

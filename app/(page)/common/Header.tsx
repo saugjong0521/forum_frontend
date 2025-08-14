@@ -6,9 +6,9 @@ import React from "react";
 const Header = () => {
     return (
         <div className="w-full flex flex-shrink-0 h-[90px] bg-[#fff] text-white">
-            <div className="w-full h-full flex items-center gap-[10px] px-[20px]">
+            <div className="w-full h-full flex items-center gap-[100px] px-[20px]">
 
-                <div className="items-center h-full flex">
+                <div className="items-center h-full flex px-4">
                     <p className="text-[#000]">Logo</p>
                 </div>
 
