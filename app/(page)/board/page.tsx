@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import BoardComponent from "@/app/components/BoardComponent";
 
 export default function BoardPage() {
@@ -6,7 +7,9 @@ export default function BoardPage() {
       <div className="w-full h-full bg-[#fff] rounded-lg p-4 gap-[10px] flex flex-col">
         <h2 className="text-2xl font-bold mb-4 text-[#000]">게시판</h2>
 
-        <BoardComponent />
+        <Suspense fallback={<div className="text-center py-8">로딩 중...</div>}>
+          <BoardComponent />
+        </Suspense>
 
         <div className="flex flex-1 bg-white"></div>
       </div>
