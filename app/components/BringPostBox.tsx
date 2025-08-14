@@ -19,7 +19,7 @@ export default function BringPostBox({ currentPage }: BringPostBoxProps) {
     bringPosts({ 
       skip, 
       limit: POSTS_PER_PAGE,
-      board_id: 0 
+      board_id: 2
     });
   }, [currentPage]);
 

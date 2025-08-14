@@ -46,7 +46,7 @@ export const useUploadPost = () => {
     const postData: UploadPostRequest = {
       title: params.title.trim(),
       content: params.content,
-      board_id: params.board_id || 0, // 기본값 0
+      board_id: params.board_id || 2, // 기본값 0
       password: params.password.trim()
     };
 

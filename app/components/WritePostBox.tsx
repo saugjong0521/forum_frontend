@@ -7,7 +7,7 @@ import { SlateTextEditorRef } from './SlateTextEditor';
 import { useUploadPost } from '../hooks/useUploadPost';
 import { useUserInfoStore } from '../store/useUserInfoStore';
 
-export default function PostWriteBox() {
+export default function WritePostBox() {
     const router = useRouter();
     const editorRef = useRef<SlateTextEditorRef>(null);
     const { uploadPost, loading, error } = useUploadPost();
@@ -34,11 +34,6 @@ export default function PostWriteBox() {
             return;
         }
 
-        if (!password.trim()) {
-            alert('비밀번호를 입력해주세요.');
-            return;
-        }
-
         // 에디터에서 HTML 콘텐츠 가져오기
         const content = editorRef.current?.getHTML() || '';
 
@@ -47,11 +42,11 @@ export default function PostWriteBox() {
             return;
         }
 
-        // 훅에 필요한 파라미터만 전달
+        // 훅에 필요한 파라미터만 전달 (패스워드는 없으면 빈 문자열)
         const result = await uploadPost({
             title,
             content,
-            password,
+            password: password.trim() || '', // 빈 문자열이면 그대로 빈 문자열
             // board_id는 선택적이므로 생략 (훅에서 기본값 0 사용)
         });
 
@@ -76,14 +71,8 @@ export default function PostWriteBox() {
             <div className="bg-[#fff] w-full h-full rounded-lg p-4 flex-col flex gap-[5px]">
                 <h1 className="text-2xl font-bold mb-2 text-[#000]">게시글 작성</h1>
 
-                {/* 에러 메시지 표시 */}
-                {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                        {error}
-                    </div>
-                )}
 
-                <div className="flex-5 flex bg-transparent flex flex-col gap-4">
+                <div className="flex-5 flex bg-transparent flex flex-col">
                     {/* 제목 입력 */}
                     <div className="flex w-full items-center gap-[20px] px-4">
                         <p className="text-[#fff] w-[180px] bg-[#aaa] h-full items-center flex p-2">제목</p>
@@ -92,7 +81,7 @@ export default function PostWriteBox() {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="제목을 입력하세요"
-                            className="w-full border-gray-300 border text-[#000] p-2 rounded"
+                            className="w-full border-gray-300 border text-[#000] p-1 rounded"
                             disabled={isSubmitting || loading}
                         />
                     </div>
@@ -100,20 +89,20 @@ export default function PostWriteBox() {
                     {/* 닉네임 표시 */}
                     <div className="flex w-full items-center gap-[20px] px-4">
                         <p className="text-[#fff] w-[180px] bg-[#aaa] h-full items-center flex p-2">닉네임</p>
-                        <div className="w-full border-gray-300 border text-[#000] p-2 rounded bg-gray-100">
+                        <div className="w-full border-gray-300 border text-[#000] p-1 rounded bg-gray-100">
                             {username || '로그인이 필요합니다'}
                         </div>
                     </div>
 
-                    {/* 비밀번호 입력 */}
+                    {/* 비밀번호 입력 (선택사항) */}
                     <div className="flex w-full items-center gap-[20px] px-4">
-                        <p className="text-[#fff] w-[180px] bg-[#aaa] h-full items-center flex p-2">비밀번호</p>
+                        <p className="text-[#fff] w-[180px] bg-[#aaa] h-full items-center flex p-2">비밀번호 (선택)</p>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="비밀번호를 입력하세요"
-                            className="w-full border-gray-300 border text-[#000] p-2 rounded"
+                            placeholder="비밀번호를 입력하세요 (선택사항)"
+                            className="w-full border-gray-300 border text-[#000] p-1 rounded"
                             disabled={isSubmitting || loading}
                         />
                     </div>
@@ -121,7 +110,7 @@ export default function PostWriteBox() {
                     {/* 내용 입력 (에디터) */}
                     <div className="flex w-full gap-[20px] px-4">
                         <p className="text-[#fff] w-[180px] bg-[#aaa] items-start flex p-2">내용</p>
-                        <div className="w-full">
+                        <div className="w-full p-1">
                             <SlateTextEditor ref={editorRef} />
                         </div>
                     </div>
@@ -131,7 +120,7 @@ export default function PostWriteBox() {
                         <button
                             onClick={handleSubmit}
                             disabled={isSubmitting || loading}
-                            className={`px-6 py-3 text-white rounded font-medium transition-colors ${isSubmitting || loading
+                            className={`px-6 py-2 text-white rounded font-medium transition-colors ${isSubmitting || loading
                                     ? 'bg-gray-400 cursor-not-allowed'
                                     : 'bg-blue-500 hover:bg-blue-600'
                                 }`}
@@ -141,7 +130,7 @@ export default function PostWriteBox() {
                         <button
                             onClick={handleGoBack}
                             disabled={isSubmitting || loading}
-                            className="px-6 py-3 bg-gray-500 text-white rounded hover:bg-gray-600 font-medium transition-colors disabled:opacity-50"
+                            className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 font-medium transition-colors disabled:opacity-50"
                         >
                             뒤로가기
                         </button>
