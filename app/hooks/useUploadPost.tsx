@@ -5,6 +5,12 @@ import { useSessionTokenStore } from '../store/useSessionTokenStore';
 import { PATH } from '../constants/path';
 import { api } from '../api';
 
+interface UploadPostParams {
+  title: string;
+  content: string;
+  password: string;
+  board_id?: number; // 선택적으로 만들고 기본값 사용
+}
 
 interface UploadPostRequest {
   title: string;
@@ -14,7 +20,6 @@ interface UploadPostRequest {
 }
 
 interface UploadPostResponse {
-  // API 응답 타입을 실제 응답에 맞게 수정하세요
   id: number;
   author_id: number;
   board_id: number;
@@ -33,12 +38,20 @@ export const useUploadPost = () => {
   const [error, setError] = useState<string | null>(null);
   const { token } = useSessionTokenStore();
 
-  const uploadPost = async (data: UploadPostRequest): Promise<UploadPostResponse | null> => {
+  const uploadPost = async (params: UploadPostParams): Promise<UploadPostResponse | null> => {
     setLoading(true);
     setError(null);
 
+    // 훅에서 postData 객체 생성
+    const postData: UploadPostRequest = {
+      title: params.title.trim(),
+      content: params.content,
+      board_id: params.board_id || 0, // 기본값 0
+      password: params.password.trim()
+    };
+
     try {
-      const response = await api.post(PATH.UPLOADPOST, data, {
+      const response = await api.post(PATH.UPLOADPOST, postData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

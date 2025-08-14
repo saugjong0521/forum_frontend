@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { SlateTextEditor,  } from "@/app/components";
+import { SlateTextEditor, } from "@/app/components";
 import { useRouter } from 'next/navigation';
 import { SlateTextEditorRef } from './SlateTextEditor';
 import { useUploadPost } from '../hooks/useUploadPost';
@@ -34,11 +34,6 @@ export default function PostWriteBox() {
             return;
         }
 
-        if (!nickname.trim()) {
-            alert('닉네임을 입력해주세요.');
-            return;
-        }
-
         if (!password.trim()) {
             alert('비밀번호를 입력해주세요.');
             return;
@@ -46,43 +41,33 @@ export default function PostWriteBox() {
 
         // 에디터에서 HTML 콘텐츠 가져오기
         const content = editorRef.current?.getHTML() || '';
-        
+
         if (!content.trim() || content === '<p></p>' || content === '<br />') {
             alert('내용을 입력해주세요.');
             return;
         }
 
-        setIsSubmitting(true);
+        // 훅에 필요한 파라미터만 전달
+        const result = await uploadPost({
+            title,
+            content,
+            password,
+            // board_id는 선택적이므로 생략 (훅에서 기본값 0 사용)
+        });
 
-        try {
-            const postData = {
-                title: title.trim(),
-                content: content,
-                board_id: 0,
-                password: password.trim()
-            };
+        if (result) {
+            alert('게시글이 성공적으로 작성되었습니다!');
 
-            const result = await uploadPost(postData);
+            // 폼 초기화
+            setTitle('');
+            setNickname('');
+            setPassword('');
+            editorRef.current?.clear();
 
-            if (result) {
-                alert('게시글이 성공적으로 작성되었습니다!');
-                
-                // 폼 초기화
-                setTitle('');
-                setNickname('');
-                setPassword('');
-                editorRef.current?.clear();
-                
-                // 게시글 목록으로 이동 (경로는 프로젝트에 맞게 수정)
-                router.push('/board');
-            } else {
-                alert(error || '게시글 작성에 실패했습니다.');
-            }
-        } catch (err) {
-            console.error('게시글 작성 중 오류:', err);
-            alert('게시글 작성 중 오류가 발생했습니다.');
-        } finally {
-            setIsSubmitting(false);
+            // 게시글 목록으로 이동
+            router.push('/board');
+        } else if (error) {
+            alert(error);
         }
     };
 
@@ -102,7 +87,7 @@ export default function PostWriteBox() {
                     {/* 제목 입력 */}
                     <div className="flex w-full items-center gap-[20px] px-4">
                         <p className="text-[#fff] w-[180px] bg-[#aaa] h-full items-center flex p-2">제목</p>
-                        <input 
+                        <input
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
@@ -123,7 +108,7 @@ export default function PostWriteBox() {
                     {/* 비밀번호 입력 */}
                     <div className="flex w-full items-center gap-[20px] px-4">
                         <p className="text-[#fff] w-[180px] bg-[#aaa] h-full items-center flex p-2">비밀번호</p>
-                        <input 
+                        <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -143,18 +128,17 @@ export default function PostWriteBox() {
 
                     {/* 버튼들 */}
                     <div className="flex justify-center gap-[80px] mt-6">
-                        <button 
+                        <button
                             onClick={handleSubmit}
                             disabled={isSubmitting || loading}
-                            className={`px-6 py-3 text-white rounded font-medium transition-colors ${
-                                isSubmitting || loading
+                            className={`px-6 py-3 text-white rounded font-medium transition-colors ${isSubmitting || loading
                                     ? 'bg-gray-400 cursor-not-allowed'
                                     : 'bg-blue-500 hover:bg-blue-600'
-                            }`}
+                                }`}
                         >
                             {isSubmitting || loading ? '작성 중...' : '작성'}
                         </button>
-                        <button 
+                        <button
                             onClick={handleGoBack}
                             disabled={isSubmitting || loading}
                             className="px-6 py-3 bg-gray-500 text-white rounded hover:bg-gray-600 font-medium transition-colors disabled:opacity-50"
