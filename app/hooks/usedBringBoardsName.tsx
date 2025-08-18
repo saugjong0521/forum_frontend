@@ -27,17 +27,9 @@ export const useBringBoardsName = () => {
     setBoards,
     setLoading,
     setError,
-    shouldRefetch,
   } = useBoardsNameStore();
 
   const bringBoardsName = useCallback(async (params: GetBoardsParams = {}) => {
-    const { forceRefresh = false } = params;
-    
-    // 캐시된 데이터가 있고 강제 새로고침이 아니며 만료되지 않았다면 return
-    if (!forceRefresh && boards.length > 0 && !shouldRefetch()) {
-      console.log('useBringBoardsName: 캐시된 데이터 사용');
-      return boards;
-    }
 
     setLoading(true);
     setError(null);
@@ -46,16 +38,6 @@ export const useBringBoardsName = () => {
       skip: params.skip || 0,
       limit: params.limit || 100,
     };
-
-    console.log('useBringBoardsName API 호출:', {
-      입력_params: params,
-      최종_queryParams: queryParams,
-      캐시상태: { 
-        기존_boards_길이: boards.length,
-        shouldRefetch: shouldRefetch(),
-        forceRefresh 
-      }
-    });
 
     try {
       const response = await api.get(PATH.GETBOARDNAME, {
@@ -73,7 +55,7 @@ export const useBringBoardsName = () => {
     } finally {
       setLoading(false);
     }
-  }, [boards.length, shouldRefetch, setBoards, setLoading, setError]);
+  }, [boards.length, setBoards, setLoading, setError]);
 
   // 강제 새로고침 함수
   const refreshBoards = useCallback(async () => {

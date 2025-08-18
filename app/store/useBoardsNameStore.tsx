@@ -25,8 +25,7 @@ interface BoardsNameState {
   
   // 유틸리티 함수들
   getBoardById: (id: number) => Board | undefined;
-  getBoardName: (id: number | null) => string;
-  shouldRefetch: (maxAgeMinutes?: number) => boolean;
+  getBoardName: (id: number | null) => string;  
   
   // 초기화
   reset: () => void;
@@ -60,15 +59,7 @@ export const useBoardsNameStore = create<BoardsNameState>((set, get) => ({
     const board = boards.find(board => board.id === id);
     return board ? board.name : '게시판';
   },
-  
-  shouldRefetch: (maxAgeMinutes = 30) => {
-    const { lastFetched } = get();
-    if (!lastFetched) return true;
-    
-    const maxAge = maxAgeMinutes * 60 * 1000; // 밀리초로 변환
-    const age = Date.now() - lastFetched;
-    return age > maxAge;
-  },
+
   
   // 초기화
   reset: () => set({
