@@ -1,14 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Link from "next/link";
 import { useRouter, useSearchParams } from 'next/navigation';
 import BringPostBox from './BringPostBox';
+import { useBoardStore } from '../store/useBoardStore';
 
 export default function BoardComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(1);
+  
+  const {
+    currentPage,
+    hasNextPage,
+    setCurrentPage,
+    goToNextPage,
+    goToPrevPage,
+  } = useBoardStore();
 
   // URL에서 페이지 번호 읽어오기
   useEffect(() => {
@@ -19,30 +27,32 @@ export default function BoardComponent() {
         setCurrentPage(pageNumber);
       }
     }
-  }, [searchParams]);
+  }, [searchParams, setCurrentPage]);
 
   // 페이지 변경 시 URL 업데이트
   const updatePageInURL = (page: number) => {
     const params = new URLSearchParams(searchParams);
     params.set('page', page.toString());
     router.push(`?${params.toString()}`);
-    setCurrentPage(page);
   };
+
+  // currentPage가 변경될 때마다 URL 업데이트
+  useEffect(() => {
+    updatePageInURL(currentPage);
+  }, [currentPage]);
   
   // 이전/다음 페이지 핸들러
   const handlePrevPage = () => {
-    if (currentPage > 1) {
-      updatePageInURL(currentPage - 1);
-    }
+    goToPrevPage();
   };
 
   const handleNextPage = () => {
-    updatePageInURL(currentPage + 1);
+    goToNextPage();
   };
 
   return (
     <>
-      <BringPostBox currentPage={currentPage} />
+      <BringPostBox />
 
       <div className="flex flex-1 bg-white gap-[10px] flex-col">
         <div className="flex flex-1 bg-white items-center justify-end">
@@ -67,7 +77,8 @@ export default function BoardComponent() {
           
           <button 
             onClick={handleNextPage}
-            className="text-3xl text-black hover:text-blue-600"
+            disabled={!hasNextPage}
+            className={`text-3xl ${!hasNextPage ? 'text-gray-300 cursor-not-allowed' : 'text-black hover:text-blue-600'}`}
           >
             &#x300B;
           </button>

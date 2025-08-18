@@ -1,21 +1,7 @@
-'use client';
-
-import { useState, useEffect } from 'react';
+import { useCallback } from 'react';
 import { PATH } from '../constants/path';
 import { api } from '../api';
-
-interface Post {
-  id: number;
-  author_id: number;
-  board_id: number;
-  title: string;
-  view_count: number;
-  like_count: number;
-  is_active: boolean;
-  password: string;
-  created_at: string;
-  updated_at: string;
-}
+import { useBoardStore } from '../store/useBoardStore';
 
 interface GetPostsParams {
   skip?: number;
@@ -24,18 +10,26 @@ interface GetPostsParams {
 }
 
 export const useBringPost = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    posts,
+    loading,
+    error,
+    currentBoardId,
+    postsPerPage,
+    setPosts,
+    setLoading,
+    setError,
+    setHasNextPage,
+  } = useBoardStore();
 
-  const bringPosts = async (params: GetPostsParams = {}): Promise<Post[] | null> => {
+  const bringPosts = useCallback(async (params: GetPostsParams = {}) => {
     setLoading(true);
     setError(null);
 
     const queryParams = {
       skip: params.skip || 0,
-      limit: params.limit || 10,
-      board_id: params.board_id || 0
+      limit: params.limit || postsPerPage,
+      board_id: params.board_id || currentBoardId
     };
 
     try {
@@ -43,18 +37,42 @@ export const useBringPost = () => {
         params: queryParams,
       });
 
-      setPosts(response.data);
-      return response.data;
+      const fetchedPosts = response.data;
+      setPosts(fetchedPosts);
+
+      // 다음 페이지가 있는지 확인
+      const requestedLimit = queryParams.limit;
+      const hasMore = fetchedPosts.length === requestedLimit;
+      
+      if (hasMore) {
+        try {
+          const nextPageResponse = await api.get(PATH.GETPOST, {
+            params: {
+              ...queryParams,
+              skip: (queryParams.skip || 0) + requestedLimit,
+              limit: 1
+            },
+          });
+          setHasNextPage(nextPageResponse.data.length > 0);
+        } catch {
+          setHasNextPage(false);
+        }
+      } else {
+        setHasNextPage(false);
+      }
+
+      return fetchedPosts;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '게시글을 가져오는데 실패했습니다.';
       setError(errorMessage);
       console.error('게시글 조회 오류:', err);
       setPosts([]);
+      setHasNextPage(false);
       return null;
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentBoardId, postsPerPage, setPosts, setLoading, setError, setHasNextPage]);
 
   return {
     posts,

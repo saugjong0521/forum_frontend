@@ -3,39 +3,85 @@
 import { useEffect } from 'react';
 import Link from "next/link";
 import { useBringPost } from '../hooks/useBringPost';
+import { useBoardStore } from '../store/useBoardStore';
 
-interface BringPostBoxProps {
-  currentPage: number;
-}
-
-export default function BringPostBox({ currentPage }: BringPostBoxProps) {
+export default function BringPostBox() {
   const { posts, bringPosts, loading, error } = useBringPost();
-  
-  const POSTS_PER_PAGE = 10;
+  const { currentPage, postsPerPage } = useBoardStore();
 
   // 페이지가 변경될 때마다 게시글 가져오기
   useEffect(() => {
-    const skip = (currentPage - 1) * POSTS_PER_PAGE;
+    const skip = (currentPage - 1) * postsPerPage;
     bringPosts({ 
       skip, 
-      limit: POSTS_PER_PAGE,
-      board_id: 2
+      limit: postsPerPage,
     });
-  }, [currentPage]);
+  }, [currentPage, bringPosts, postsPerPage]);
 
   // 날짜 포맷 함수
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
       month: '2-digit',
       day: '2-digit'
     });
   };
 
+  // 10개 행을 채우기 위한 빈 행 생성 함수
+  const renderTableRows = () => {
+    const rows = [];
+    
+    // 실제 게시글 행들
+    for (let i = 0; i < posts.length; i++) {
+      const post = posts[i];
+      rows.push(
+        <tr key={post.id} className="hover:bg-gray-50">
+          <td className="px-4 py-3 text-sm text-gray-900 border-b text-center">
+            {post.id}
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-900 border-b">
+            <Link 
+              href={`/board/${post.id}`}
+              className="text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              {post.title}
+            </Link>
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
+            {post.view_count}
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
+            {formatDate(post.created_at)}
+          </td>
+        </tr>
+      );
+    }
+    
+    // 빈 행들로 10개까지 채우기
+    for (let i = posts.length; i < postsPerPage; i++) {
+      rows.push(
+        <tr key={`empty-${i}`}>
+          <td className="px-4 py-3 text-sm text-gray-900 border-b text-center">
+            &nbsp;
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-900 border-b">
+            &nbsp;
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
+            &nbsp;
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
+            &nbsp;
+          </td>
+        </tr>
+      );
+    }
+    
+    return rows;
+  };
+
   return (
     <div className="flex flex-5 bg-white w-full border border-gray-300 rounded">
-
       {/* 로딩 상태 */}
       {loading ? (
         <div className="w-full p-8 text-center text-gray-500">
@@ -52,35 +98,7 @@ export default function BringPostBox({ currentPage }: BringPostBoxProps) {
             </tr>
           </thead>
           <tbody>
-            {posts.length > 0 ? (
-              posts.map((post) => (
-                <tr key={post.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-900 border-b text-center">
-                    {post.id}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 border-b">
-                    <Link 
-                      href={`/board/${post.id}`}
-                      className="text-blue-600 hover:text-blue-800 hover:underline"
-                    >
-                      {post.title}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
-                    {post.view_count}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
-                    {formatDate(post.created_at)}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
-                  게시글이 없습니다.
-                </td>
-              </tr>
-            )}
+            {renderTableRows()}
           </tbody>
         </table>
       )}
