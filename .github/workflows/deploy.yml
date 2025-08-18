@@ -38,7 +38,7 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         password: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_PORT }}
-        timeout: 60s
+        timeout: 120s
         script: |
           cd /home/frontend/over101/forum_frontend
           git pull origin main
