@@ -101,15 +101,6 @@ export default function BringBoardBox() {
     return rows;
   };
 
-  // 디버깅: posts 데이터 확인
-  useEffect(() => {
-    if (posts.length > 0) {
-      console.log('받은 게시글 데이터:', posts);
-      console.log('첫 번째 게시글 날짜:', posts[0]?.created_at);
-      console.log('마지막 게시글 날짜:', posts[posts.length - 1]?.created_at);
-    }
-  }, [posts]);
-
   return (
     <div className="flex flex-5 bg-white w-full border border-gray-300 rounded">
       {/* 에러 상태 */}

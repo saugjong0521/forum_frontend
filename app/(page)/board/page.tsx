@@ -6,7 +6,6 @@ export default function BoardPage() {
   return (
     <div className="w-full h-full bg-[#ccc] p-[10px] flex gap-[15px]">
       <div className="w-full h-full bg-[#fff] rounded-lg p-4 gap-[10px] flex flex-col flex-4">
-        <h2 className="text-2xl font-bold mb-4 text-[#000] flex">게시판리스트 추가하는게 좋으려나</h2>
 
         <Suspense fallback={<div className="text-center py-8">로딩 중...</div>}>
           <BoardComponent />

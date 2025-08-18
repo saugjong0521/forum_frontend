@@ -4,12 +4,15 @@ import { useEffect } from 'react';
 import Link from "next/link";
 import { useRouter, useSearchParams } from 'next/navigation';
 import BringBoardBox from './BringBoardBox';
-import { useBoardStore } from '../../store/useBoardStore';
+import { useBoardStore } from '../../store/useBoardStore'; // 게시글 관련
+import { useBoardsNameStore } from '../../store/useBoardsNameStore'; // 게시판 목록 관련
+import { useBringBoardsName } from '@/app/hooks/usedBringBoardsName';
 
 export default function BoardComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
+  // 게시글 관련 store
   const {
     currentPage,
     hasNextPage,
@@ -21,7 +24,20 @@ export default function BoardComponent() {
     goToPrevPage,
     setSorting,
     resetBoard,
+    setBoardId
   } = useBoardStore();
+
+  // 게시판 목록 관련 store & hook
+  const { getBoardName } = useBoardsNameStore();
+  const { boards, bringBoardsName, loading: boardsLoading, error: boardsError } = useBringBoardsName();
+
+  // 컴포넌트 마운트 시 게시판 목록 가져오기
+  useEffect(() => {
+    bringBoardsName({
+      skip: 0,
+      limit: 100
+    });
+  }, [bringBoardsName]);
 
   // URL에서 페이지 번호 읽어오기
   useEffect(() => {
@@ -55,19 +71,7 @@ export default function BoardComponent() {
     goToNextPage();
   };
 
-  // 게시판 제목 표시
-  const getBoardTitle = () => {
-    switch (currentBoardId) {
-      case 1:
-        return '공지사항';
-      case 2:
-        return '게시판';
-      default:
-        return '게시판';
-    }
-  };
-
-  // 정렬 변경 핸들러 (디버깅 추가)
+  // 정렬 변경 핸들러
   const handleSortChange = (newSortBy: string, newSortOrder: string) => {
     console.log('정렬 변경:', { 
       이전: { sortBy, sortOrder },
@@ -76,11 +80,10 @@ export default function BoardComponent() {
     setSorting(newSortBy, newSortOrder);
   };
 
-  // select 변경 핸들러 (수정된 분할 로직)
+  // select 변경 핸들러
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     console.log('select 변경됨:', e.target.value);
     
-    // 마지막 언더스코어를 기준으로 분할
     const value = e.target.value;
     const lastUnderscoreIndex = value.lastIndexOf('_');
     const newSortBy = value.substring(0, lastUnderscoreIndex);
@@ -90,11 +93,62 @@ export default function BoardComponent() {
     handleSortChange(newSortBy, newSortOrder);
   };
 
+  // 게시판 클릭 핸들러
+  const handleBoardThemeClick = (id: number) => {
+    console.log('게시판 클릭:', id);
+    setBoardId(id);
+  };
+
+  // 전체 게시판 클릭 핸들러
+  const handleAllBoardsClick = () => {
+    console.log('전체 게시판 클릭');
+    setBoardId(null);
+  };
+
   return (
     <>
       {/* 게시판 헤더 */}
       <div className="w-full bg-white p-4 flex justify-between items-center">
-        <h2 className="text-xl font-bold text-[#000]">{getBoardTitle()}</h2>
+        
+        {/* 게시판 네비게이션 */}
+        <div className="flex items-center gap-2">
+          {boardsLoading ? (
+            <div className="text-sm text-gray-500">로딩 중...</div>
+          ) : boardsError ? (
+            <div className="text-sm text-red-500">에러: {boardsError}</div>
+          ) : (
+            <>
+              {/* 전체 게시판 버튼 */}
+              <button
+                onClick={handleAllBoardsClick}
+                className={`px-3 py-1 text-sm rounded transition-colors ${
+                  currentBoardId === null
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                전체
+              </button>
+              
+              {/* 개별 게시판 버튼들 */}
+              {boards.map((board) => (
+                <button
+                  key={board.id}
+                  onClick={() => handleBoardThemeClick(board.id)}
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    currentBoardId === board.id
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  {board.name}
+                </button>
+              ))}
+            </>
+          )}
+        </div>
+        
+        <h2 className="text-xl font-bold text-[#000]">{getBoardName(currentBoardId)}</h2>
         
         {/* 정렬 옵션 */}
         <div className="flex items-center gap-2">
@@ -148,7 +202,6 @@ export default function BoardComponent() {
             &#x300B;
           </button>
         </div>
-
       </div>
     </>
   );
