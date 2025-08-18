@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import BoardComponent from "@/app/components/BoardComponent";
+import BoardComponent from "@/app/components/board/BoardComponent";
 
 export default function BoardPage() {
   return (

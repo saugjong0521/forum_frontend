@@ -1,7 +1,7 @@
 'use client'
 
 import React from "react";
-import useSignUp from "../hooks/useSignUp";
+import useSignUp from "../../hooks/useSignUp";
 
 const SignUpBox = () => {
   const { formData, handleChange, handleSubmit, loading, error, success } = useSignUp();

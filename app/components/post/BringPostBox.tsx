@@ -39,9 +39,9 @@ const formatDate = (dateString: string) => {
 
 const BringPostBox = ({ post }: BringPostBoxProps) => {
     return (
-        <div className="bg-white rounded-lg border border-gray-300 p-6 mb-4">
+        <div className="bg-white rounded-lg border border-[#000] p-6 mb-4">
             {/* 게시글 헤더 */}
-            <div className="border-b border-gray-200 pb-4 mb-4">
+            <div className="border-b border-[#000] pb-4 mb-4">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
                     {post.title}
                 </h1>
@@ -65,26 +65,6 @@ const BringPostBox = ({ post }: BringPostBoxProps) => {
                     className="text-gray-800 leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: post.content }}
                 />
-            </div>
-
-            {/* 게시글 액션 */}
-            <div className="border-t border-gray-200 pt-4 mt-6">
-                <div className="flex items-center justify-center gap-4">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
-                        <span>👍</span>
-                        <span>추천 ({post.like_count})</span>
-                    </button>
-                    
-                    <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
-                        <span>📝</span>
-                        <span>수정</span>
-                    </button>
-                    
-                    <button className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors">
-                        <span>🗑️</span>
-                        <span>삭제</span>
-                    </button>
-                </div>
             </div>
         </div>
     );

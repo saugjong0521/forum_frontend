@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import Link from "next/link";
 import { useRouter, useSearchParams } from 'next/navigation';
 import BringBoardBox from './BringBoardBox';
-import { useBoardStore } from '../store/useBoardStore';
+import { useBoardStore } from '../../store/useBoardStore';
 
 export default function BoardComponent() {
   const router = useRouter();
@@ -94,21 +94,16 @@ export default function BoardComponent() {
     <>
       {/* 게시판 헤더 */}
       <div className="w-full bg-white p-4 flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800">{getBoardTitle()}</h2>
+        <h2 className="text-xl font-bold text-[#000]">{getBoardTitle()}</h2>
         
         {/* 정렬 옵션 */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">정렬:</span>
-          
-          {/* 현재 상태 표시 (디버깅용) */}
-          <span className="text-xs text-blue-600">
-            현재: {sortBy}_{sortOrder}
-          </span>
+          <span className="text-sm text-[#000]">정렬:</span>
           
           <select 
             value={`${sortBy}_${sortOrder}`}
             onChange={handleSelectChange}
-            className="text-sm border border-gray-300 rounded px-2 py-1"
+            className="text-sm border text-[#000] rounded px-2 py-1"
           >
             <option value="created_at_desc">작성시간 내림차순</option>
             <option value="created_at_asc">작성시간 오름차순</option>

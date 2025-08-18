@@ -1,4 +1,4 @@
-import PostComponent from "@/app/components/PostComponent";
+import PostComponent from "@/app/components/post/PostComponent";
 
 
 export default function Post() {

@@ -2,9 +2,29 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import useBringPost from '../hooks/useBringPost';
+import useBringPost from '../../hooks/useBringPost';
 import BringPostBox from './BringPostBox';
-import BringCommentBox from './BringCommentBox';
+import CommentComponent from '../comment/CommentComponent';
+
+interface Author {
+    id: number;
+    username: string;
+    nickname: string;
+    created_at: string;
+}
+
+interface Comment {
+    content: string;
+    parent_id: number;
+    id: number;
+    post_id: number;
+    author_id: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    author: Author;
+    children: string[];
+}
 
 const PostComponent = () => {
     const params = useParams();
@@ -15,6 +35,7 @@ const PostComponent = () => {
     const [showPasswordInput, setShowPasswordInput] = useState(false);
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const [currentComments, setCurrentComments] = useState<Comment[]>([]);
 
     // 게시글 조회
     useEffect(() => {
@@ -22,6 +43,13 @@ const PostComponent = () => {
             bringPost({ post_id: postId });
         }
     }, [postId, bringPost]);
+
+    // 게시글 로딩 성공 시 댓글 상태 초기화
+    useEffect(() => {
+        if (post?.comments) {
+            setCurrentComments(post.comments);
+        }
+    }, [post?.comments]);
 
     // 에러 처리
     useEffect(() => {
@@ -41,13 +69,10 @@ const PostComponent = () => {
         }
     }, [post, loading, error]);
 
-    // 게시글 로딩 성공 시 비밀번호 입력 화면 숨기기
-    useEffect(() => {
-        if (post && !loading && !error) {
-            setShowPasswordInput(false);
-            setPasswordError('');
-        }
-    }, [post, loading, error]);
+    // 댓글 업데이트 핸들러
+    const handleCommentsUpdate = (updatedComments: Comment[]) => {
+        setCurrentComments(updatedComments);
+    };
 
     // 비밀번호 입력 처리
     const handlePasswordSubmit = () => {
@@ -88,10 +113,10 @@ const PostComponent = () => {
             <div className="w-full h-full bg-[#ccc] flex p-[10px]">
                 <div className="bg-[#fff] w-full h-full rounded-lg flex items-center justify-center">
                     <div className="max-w-md w-full p-6">
-                        <h2 className="text-xl font-bold text-center mb-4">
+                        <h2 className="text-xl text-[#000] font-bold text-center mb-4">
                             비밀번호 보호된 게시글
                         </h2>
-                        <p className="text-gray-600 text-center mb-6">
+                        <p className="text-[#000] text-center mb-6">
                             이 게시글을 보려면 비밀번호를 입력해주세요.
                         </p>
                         
@@ -102,7 +127,7 @@ const PostComponent = () => {
                                 onChange={(e) => setPassword(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handlePasswordSubmit()}
                                 placeholder="4자리 숫자 입력"
-                                className="w-full p-3 border border-gray-300 rounded text-center text-lg tracking-widest"
+                                className="w-full p-3 border text-[#000] rounded text-center text-lg tracking-widest"
                                 maxLength={4}
                             />
                             
@@ -181,8 +206,12 @@ const PostComponent = () => {
                     {/* 게시글 박스 */}
                     <BringPostBox post={post} />
                     
-                    {/* 댓글 박스 */}
-                    <BringCommentBox comments={post.comments} />
+                    {/* 댓글 컴포넌트 */}
+                    <CommentComponent 
+                        comments={currentComments} 
+                        postId={postId}
+                        onCommentsUpdate={handleCommentsUpdate}
+                    />
                 </div>
             </div>
         </div>

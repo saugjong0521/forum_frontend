@@ -24,15 +24,15 @@ const Header = () => {
                 </div>
 
                 <div className="flex gap-4 h-full items-center">
-                    <Link href="./" className="p-4">
+                    <Link href="/" className="p-4">
                         <p className="text-[#000]">홈</p>
                     </Link>
 
-                    <Link href="./board" className="p-4" onClick={handleNoticeClick}>
+                    <Link href="/board" className="p-4" onClick={handleNoticeClick}>
                         <p className="text-[#000]">공지사항</p>
                     </Link>
 
-                    <Link href="./board" className="p-4" onClick={handleBoardClick}>
+                    <Link href="/board" className="p-4" onClick={handleBoardClick}>
                         <p className="text-[#000]">게시판</p>
                     </Link>
                 </div>

@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 import Link from "next/link";
-import { useBringBoard } from '../hooks/useBringBoard';
-import { useBoardStore } from '../store/useBoardStore';
+import { useBringBoard } from '../../hooks/useBringBoard';
+import { useBoardStore } from '../../store/useBoardStore';
 
 export default function BringBoardBox() {
   const { posts, bringboard, loading, error } = useBringBoard();

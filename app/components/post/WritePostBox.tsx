@@ -4,9 +4,9 @@ import { useRef, useState } from 'react';
 import { SlateTextEditor, } from "@/app/components";
 import { useRouter } from 'next/navigation';
 import { SlateTextEditorRef } from './SlateTextEditor';
-import { useUploadPost } from '../hooks/useUploadPost';
-import { useUserInfoStore } from '../store/useUserInfoStore';
-import { useBoardStore } from '../store/useBoardStore';
+import { useUploadPost } from '../../hooks/useUploadPost';
+import { useUserInfoStore } from '../../store/useUserInfoStore';
+import { useBoardStore } from '../../store/useBoardStore';
 
 export default function WritePostBox() {
     const router = useRouter();
@@ -80,7 +80,6 @@ export default function WritePostBox() {
             });
 
             if (result) {
-                alert('게시글이 성공적으로 작성되었습니다!');
 
                 // 폼 초기화
                 setTitle('');

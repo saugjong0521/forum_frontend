@@ -1,8 +1,8 @@
 'use client'
 
 import React from "react";
-import { useUserInfoStore } from "../store/useUserInfoStore";
-import { useSignIn } from "../hooks/useSignIn";
+import { useUserInfoStore } from "../../store/useUserInfoStore";
+import { useSignIn } from "../../hooks/useSignIn";
 
 const UserInfoBox = () => {
     const { nickname, email } = useUserInfoStore();

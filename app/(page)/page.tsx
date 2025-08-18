@@ -1,5 +1,5 @@
 import Link from "next/link";
-import AuthPanel from "../components/AuthPanel";
+import AuthPanel from "../components/auth/AuthPanel";
 
 const MainPage = () => {
     return (

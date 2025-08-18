@@ -1,3 +1,3 @@
-export { default as SignInBox } from './SignInBox';
-export { default as SignUpBox } from './SignUpBox';
-export { default as SlateTextEditor } from './SlateTextEditor'; 
+export { default as SignInBox } from './auth/SignInBox';
+export { default as SignUpBox } from './auth/SignUpBox';
+export { default as SlateTextEditor } from './post/SlateTextEditor'; 
