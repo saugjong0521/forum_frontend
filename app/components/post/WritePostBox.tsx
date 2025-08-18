@@ -3,10 +3,10 @@
 import { useRef, useState } from 'react';
 import { SlateTextEditor, } from "@/app/components";
 import { useRouter } from 'next/navigation';
-import { SlateTextEditorRef } from './SlateTextEditor';
 import { useUploadPost } from '../../hooks/useUploadPost';
 import { useUserInfoStore } from '../../store/useUserInfoStore';
 import { useBoardStore } from '../../store/useBoardStore';
+import { SlateTextEditorRef } from './SlateTextEditor';
 
 export default function WritePostBox() {
     const router = useRouter();
@@ -72,23 +72,29 @@ export default function WritePostBox() {
         setIsSubmitting(true);
 
         try {
-            const result = await uploadPost({
+            // useUploadPost 훅의 타입에 맞게 데이터 준비
+            const postData = {
                 title,
                 content,
-                password,
-                board_id: currentBoardId // Zustand store에서 현재 board_id 사용
-            });
+                password: password || '', // 빈 문자열이면 그대로 빈 문자열로
+                ...(currentBoardId !== null && { board_id: currentBoardId }) // null이 아닐 때만 포함
+            };
+
+            const result = await uploadPost(postData);
 
             if (result) {
-
                 // 폼 초기화
                 setTitle('');
                 setNickname('');
                 setPassword('');
                 editorRef.current?.clear();
 
-                // 게시글 목록으로 이동
-                router.push('/board');
+                // 게시글 목록으로 이동 (board_id에 따라 경로 결정)
+                if (currentBoardId !== null) {
+                    router.push(`/board?board_id=${currentBoardId}`);
+                } else {
+                    router.push('/board');
+                }
             } else if (error) {
                 alert(error);
             }
@@ -110,10 +116,24 @@ export default function WritePostBox() {
         }
     };
 
+    // 현재 게시판 정보 표시
+    const getCurrentBoardName = () => {
+        if (currentBoardId === null) {
+            return '전체 게시판';
+        }
+        // TODO: 게시판 ID에 따른 이름 매핑 (게시판 목록 store가 있다면)
+        return `게시판 ${currentBoardId}`;
+    };
+
     return (
         <div className="w-full h-full bg-[#ccc] flex p-[10px]">
             <div className="bg-[#fff] w-full h-full rounded-lg p-4 flex-col flex gap-[5px]">
-                <h1 className="text-2xl font-bold mb-2 text-[#000]">게시글 작성</h1>
+                <div className="flex items-center justify-between mb-2">
+                    <h1 className="text-2xl font-bold text-[#000]">게시글 작성</h1>
+                    <div className="text-sm text-gray-600">
+                        작성 위치: {getCurrentBoardName()}
+                    </div>
+                </div>
 
                 <div className="flex-5 flex bg-transparent flex flex-col px-4">
                     <div className="flex w-full gap-[20px]">
@@ -167,6 +187,13 @@ export default function WritePostBox() {
                             </div>
                         </div>
                     </div>
+
+                    {/* 에러 메시지 표시 */}
+                    {error && (
+                        <div className="mt-3 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                            {error}
+                        </div>
+                    )}
 
                     {/* 버튼들 */}
                     <div className="flex justify-center gap-[80px] mt-6">

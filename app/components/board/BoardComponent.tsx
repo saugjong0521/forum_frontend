@@ -149,12 +149,6 @@ export default function BoardComponent() {
           </button>
         </div>
 
-        {/* 확장된 디버그 정보 */}
-        <div className="text-xs text-gray-500 text-center space-y-1">
-          <div>현재 게시판: {currentBoardId} | 페이지: {currentPage} | 다음페이지: {hasNextPage ? 'O' : 'X'}</div>
-          <div>정렬상태: {sortBy}_{sortOrder}</div>
-          <div>select value: {`${sortBy}_${sortOrder}`}</div>
-        </div>
       </div>
     </>
   );

@@ -3,7 +3,7 @@ import { create } from 'zustand';
 interface Post {
   id: number;
   author_id: number;
-  board_id: number;
+  currentBoardId: number | null;
   title: string;
   view_count: number;
   like_count: number;
@@ -15,7 +15,7 @@ interface Post {
 
 interface BoardState {
   // 게시판 설정
-  currentBoardId: number;
+  currentBoardId: number | null; // integer지만 optional이므로 null 허용
   postsPerPage: number;
   
   // 페이지네이션
@@ -32,7 +32,7 @@ interface BoardState {
   error: string | null;
   
   // Actions
-  setBoardId: (boardId: number) => void;
+  setBoardId: (boardId: number | null) => void; // number 또는 null
   setCurrentPage: (page: number) => void;
   setHasNextPage: (hasNext: boolean) => void;
   setPosts: (posts: Post[]) => void;
@@ -54,7 +54,7 @@ interface BoardState {
 
 export const useBoardStore = create<BoardState>((set, get) => ({
   // 초기 상태
-  currentBoardId: 2, // 기본 board_id
+  currentBoardId: null, // null로 기본값 설정 (board_id 없음)
   postsPerPage: 10,
   currentPage: 1,
   hasNextPage: false,

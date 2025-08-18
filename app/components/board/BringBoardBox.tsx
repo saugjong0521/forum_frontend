@@ -29,9 +29,9 @@ export default function BringBoardBox() {
     const params = { 
       skip, 
       limit: postsPerPage,
-      board_id: currentBoardId,
       sort_by: sortBy,
-      sort_order: sortOrder
+      sort_order: sortOrder,
+      ...(currentBoardId !== null && { board_id: currentBoardId }) // null이 아닐 때만 포함
     };
 
     console.log('API 호출 파라미터:', params);
@@ -112,6 +112,13 @@ export default function BringBoardBox() {
 
   return (
     <div className="flex flex-5 bg-white w-full border border-gray-300 rounded">
+      {/* 에러 상태 */}
+      {error && (
+        <div className="w-full p-8 text-center text-red-500">
+          에러: {error}
+        </div>
+      )}
+      
       {/* 로딩 상태 */}
       {loading ? (
         <div className="w-full p-8 text-center text-gray-500">
