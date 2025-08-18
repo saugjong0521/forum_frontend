@@ -1,4 +1,4 @@
-import WritePostBox from "@/app/components/board/WritePostBox";
+import WritePostBox from "@/app/components/post/WritePostBox";
 
 export default function WriteBoard() {
 
