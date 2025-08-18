@@ -4,7 +4,9 @@ export const PATH = {
   SIGNIN: "/auth/login",
   USERINFO: "/auth/me",
   UPLOADPOST: "/posts",
-  GETPOST: "/posts"
+  GETBOARD: "/posts",
+  GETPOST: (id: number) => `/posts/${id}`,
+
 } as const;
 
 

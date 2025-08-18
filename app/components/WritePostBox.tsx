@@ -6,12 +6,14 @@ import { useRouter } from 'next/navigation';
 import { SlateTextEditorRef } from './SlateTextEditor';
 import { useUploadPost } from '../hooks/useUploadPost';
 import { useUserInfoStore } from '../store/useUserInfoStore';
+import { useBoardStore } from '../store/useBoardStore';
 
 export default function WritePostBox() {
     const router = useRouter();
     const editorRef = useRef<SlateTextEditorRef>(null);
     const { uploadPost, loading, error } = useUploadPost();
     const { username } = useUserInfoStore();
+    const { currentBoardId } = useBoardStore();
 
     // 폼 상태 관리
     const [title, setTitle] = useState('');
@@ -27,42 +29,85 @@ export default function WritePostBox() {
         }
     };
 
+    // 패스워드 유효성 검사 함수
+    const validatePassword = (password: string): { isValid: boolean; message?: string } => {
+        if (password.trim() === '') {
+            return { isValid: true }; // 공란 허용
+        }
+        
+        // 숫자만 포함하는지 확인
+        if (!/^\d+$/.test(password)) {
+            return { isValid: false, message: '비밀번호는 숫자만 입력 가능합니다.' };
+        }
+        
+        // 4자리인지 확인
+        if (password.length !== 4) {
+            return { isValid: false, message: '비밀번호는 4자리 숫자여야 합니다.' };
+        }
+        
+        return { isValid: true };
+    };
+
     const handleSubmit = async () => {
-        // 유효성 검사
+        // 제목 유효성 검사
         if (!title.trim()) {
             alert('제목을 입력해주세요.');
             return;
         }
 
-        // 에디터에서 HTML 콘텐츠 가져오기
+        // 내용 유효성 검사
         const content = editorRef.current?.getHTML() || '';
-
         if (!content.trim() || content === '<p></p>' || content === '<br />') {
             alert('내용을 입력해주세요.');
             return;
         }
 
-        // 훅에 필요한 파라미터만 전달 (패스워드는 없으면 빈 문자열)
-        const result = await uploadPost({
-            title,
-            content,
-            password: password.trim() || '', // 빈 문자열이면 그대로 빈 문자열
-            // board_id는 선택적이므로 생략 (훅에서 기본값 0 사용)
-        });
+        // 패스워드 유효성 검사
+        const passwordValidation = validatePassword(password);
+        if (!passwordValidation.isValid) {
+            alert(passwordValidation.message || '비밀번호가 올바르지 않습니다.');
+            return;
+        }
 
-        if (result) {
-            alert('게시글이 성공적으로 작성되었습니다!');
+        setIsSubmitting(true);
 
-            // 폼 초기화
-            setTitle('');
-            setNickname('');
-            setPassword('');
-            editorRef.current?.clear();
+        try {
+            const result = await uploadPost({
+                title,
+                content,
+                password,
+                board_id: currentBoardId // Zustand store에서 현재 board_id 사용
+            });
 
-            // 게시글 목록으로 이동
-            router.push('/board');
-        } else if (error) {
-            alert(error);
+            if (result) {
+                alert('게시글이 성공적으로 작성되었습니다!');
+
+                // 폼 초기화
+                setTitle('');
+                setNickname('');
+                setPassword('');
+                editorRef.current?.clear();
+
+                // 게시글 목록으로 이동
+                router.push('/board');
+            } else if (error) {
+                alert(error);
+            }
+        } catch (err) {
+            console.error('게시글 작성 중 오류:', err);
+            alert('게시글 작성 중 오류가 발생했습니다.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // 패스워드 입력 시 실시간 유효성 검사 (선택사항)
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        
+        // 숫자만 입력되도록 필터링 (선택사항)
+        if (value === '' || /^\d{0,4}$/.test(value)) {
+            setPassword(value);
         }
     };
 
@@ -71,47 +116,56 @@ export default function WritePostBox() {
             <div className="bg-[#fff] w-full h-full rounded-lg p-4 flex-col flex gap-[5px]">
                 <h1 className="text-2xl font-bold mb-2 text-[#000]">게시글 작성</h1>
 
-
-                <div className="flex-5 flex bg-transparent flex flex-col">
-                    {/* 제목 입력 */}
-                    <div className="flex w-full items-center gap-[20px] px-4">
-                        <p className="text-[#fff] w-[180px] bg-[#aaa] h-full items-center flex p-2">제목</p>
-                        <input
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="제목을 입력하세요"
-                            className="w-full border-gray-300 border text-[#000] p-1 rounded"
-                            disabled={isSubmitting || loading}
-                        />
-                    </div>
-
-                    {/* 닉네임 표시 */}
-                    <div className="flex w-full items-center gap-[20px] px-4">
-                        <p className="text-[#fff] w-[180px] bg-[#aaa] h-full items-center flex p-2">닉네임</p>
-                        <div className="w-full border-gray-300 border text-[#000] p-1 rounded bg-gray-100">
-                            {username || '로그인이 필요합니다'}
+                <div className="flex-5 flex bg-transparent flex flex-col px-4">
+                    <div className="flex w-full gap-[20px]">
+                        {/* 왼쪽 라벨 기둥 */}
+                        <div className="w-[180px] bg-[#aaa] rounded flex flex-col">
+                            <div className="text-[#fff] h-[44px] flex items-center justify-center">
+                                제목
+                            </div>
+                            <div className="text-[#fff] h-[44px] flex items-center justify-center border-t border-[#999]">
+                                닉네임
+                            </div>
+                            <div className="text-[#fff] h-[44px] flex items-center justify-center border-t border-[#999]">
+                                비밀번호
+                            </div>
+                            <div className="text-[#fff] flex-1 flex items-start justify-center pt-2 border-t border-[#999]">
+                                내용
+                            </div>
                         </div>
-                    </div>
 
-                    {/* 비밀번호 입력 (선택사항) */}
-                    <div className="flex w-full items-center gap-[20px] px-4">
-                        <p className="text-[#fff] w-[180px] bg-[#aaa] h-full items-center flex p-2">비밀번호 (선택)</p>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="비밀번호를 입력하세요 (선택사항)"
-                            className="w-full border-gray-300 border text-[#000] p-1 rounded"
-                            disabled={isSubmitting || loading}
-                        />
-                    </div>
+                        {/* 오른쪽 입력 필드들 */}
+                        <div className="flex-1 flex flex-col">
+                            {/* 제목 입력 */}
+                            <input
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="제목을 입력하세요"
+                                className="w-full border-gray-300 border text-[#000] p-2 rounded h-[44px]"
+                                disabled={isSubmitting || loading}
+                            />
 
-                    {/* 내용 입력 (에디터) */}
-                    <div className="flex w-full gap-[20px] px-4">
-                        <p className="text-[#fff] w-[180px] bg-[#aaa] items-start flex p-2">내용</p>
-                        <div className="w-full p-1">
-                            <SlateTextEditor ref={editorRef} />
+                            {/* 닉네임 표시 */}
+                            <div className="w-full border-gray-300 border text-[#000] p-2 rounded bg-gray-100 h-[44px] flex items-center mt-px">
+                                {username || '로그인이 필요합니다'}
+                            </div>
+
+                            {/* 비밀번호 입력 (선택사항) */}
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={handlePasswordChange}
+                                placeholder="4자리 숫자 또는 공란 (선택사항)"
+                                className="w-full border-gray-300 border text-[#000] p-2 rounded h-[44px] mt-px"
+                                disabled={isSubmitting || loading}
+                                maxLength={4}
+                            />
+
+                            {/* 내용 입력 (에디터) */}
+                            <div className="flex-1 mt-px">
+                                <SlateTextEditor ref={editorRef} />
+                            </div>
                         </div>
                     </div>
 
@@ -120,7 +174,7 @@ export default function WritePostBox() {
                         <button
                             onClick={handleSubmit}
                             disabled={isSubmitting || loading}
-                            className={`px-6 py-2 text-white rounded font-medium transition-colors ${isSubmitting || loading
+                            className={`px-6 py-3 text-white rounded font-medium transition-colors ${isSubmitting || loading
                                     ? 'bg-gray-400 cursor-not-allowed'
                                     : 'bg-blue-500 hover:bg-blue-600'
                                 }`}
@@ -130,7 +184,7 @@ export default function WritePostBox() {
                         <button
                             onClick={handleGoBack}
                             disabled={isSubmitting || loading}
-                            className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 font-medium transition-colors disabled:opacity-50"
+                            className="px-6 py-3 bg-gray-500 text-white rounded hover:bg-gray-600 font-medium transition-colors disabled:opacity-50"
                         >
                             뒤로가기
                         </button>

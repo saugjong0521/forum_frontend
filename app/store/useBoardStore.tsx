@@ -22,6 +22,10 @@ interface BoardState {
   currentPage: number;
   hasNextPage: boolean;
   
+  // 정렬 설정
+  sortBy: string;
+  sortOrder: string;
+  
   // 게시글 데이터
   posts: Post[];
   loading: boolean;
@@ -34,6 +38,11 @@ interface BoardState {
   setPosts: (posts: Post[]) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  
+  // 정렬 Actions
+  setSortBy: (sortBy: string) => void;
+  setSortOrder: (sortOrder: string) => void;
+  setSorting: (sortBy: string, sortOrder: string) => void;
   
   // 페이지 이동
   goToNextPage: () => void;
@@ -49,17 +58,34 @@ export const useBoardStore = create<BoardState>((set, get) => ({
   postsPerPage: 10,
   currentPage: 1,
   hasNextPage: false,
+  
+  // 정렬 기본값
+  sortBy: 'created_at',
+  sortOrder: 'desc',
+  
   posts: [],
   loading: false,
   error: null,
   
   // Actions
-  setBoardId: (boardId) => set({ currentBoardId: boardId, currentPage: 1 }), // board 변경시 페이지 초기화
+  setBoardId: (boardId) => set({ 
+    currentBoardId: boardId, 
+    currentPage: 1 // board 변경시 페이지 초기화
+  }),
   setCurrentPage: (page) => set({ currentPage: page }),
   setHasNextPage: (hasNext) => set({ hasNextPage: hasNext }),
   setPosts: (posts) => set({ posts }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
+  
+  // 정렬 Actions
+  setSortBy: (sortBy) => set({ sortBy, currentPage: 1 }), // 정렬 변경시 페이지 초기화
+  setSortOrder: (sortOrder) => set({ sortOrder, currentPage: 1 }),
+  setSorting: (sortBy, sortOrder) => set({ 
+    sortBy, 
+    sortOrder, 
+    currentPage: 1 // 정렬 변경시 페이지 초기화
+  }),
   
   // 페이지 이동
   goToNextPage: () => {
@@ -83,5 +109,6 @@ export const useBoardStore = create<BoardState>((set, get) => ({
     posts: [],
     loading: false,
     error: null,
+    // 정렬은 초기화하지 않음 (사용자 설정 유지)
   }),
 }));

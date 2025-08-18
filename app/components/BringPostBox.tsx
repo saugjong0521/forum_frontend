@@ -1,107 +1,93 @@
 'use client';
 
-import { useEffect } from 'react';
-import Link from "next/link";
-import { useBringPost } from '../hooks/useBringPost';
-import { useBoardStore } from '../store/useBoardStore';
+interface Author {
+    id: number;
+    username: string;
+    nickname: string;
+    created_at: string;
+}
 
-export default function BringPostBox() {
-  const { posts, bringPosts, loading, error } = useBringPost();
-  const { currentPage, postsPerPage } = useBoardStore();
+interface Post {
+    title: string;
+    content: string;
+    board_id: number;
+    password: string;
+    id: number;
+    author_id: number;
+    view_count: number;
+    like_count: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    author: Author;
+}
 
-  // 페이지가 변경될 때마다 게시글 가져오기
-  useEffect(() => {
-    const skip = (currentPage - 1) * postsPerPage;
-    bringPosts({ 
-      skip, 
-      limit: postsPerPage,
-    });
-  }, [currentPage, bringPosts, postsPerPage]);
+interface BringPostBoxProps {
+    post: Post;
+}
 
-  // 날짜 포맷 함수
-  const formatDate = (dateString: string) => {
+const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
-      month: '2-digit',
-      day: '2-digit'
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
     });
-  };
+};
 
-  // 10개 행을 채우기 위한 빈 행 생성 함수
-  const renderTableRows = () => {
-    const rows = [];
-    
-    // 실제 게시글 행들
-    for (let i = 0; i < posts.length; i++) {
-      const post = posts[i];
-      rows.push(
-        <tr key={post.id} className="hover:bg-gray-50">
-          <td className="px-4 py-3 text-sm text-gray-900 border-b text-center">
-            {post.id}
-          </td>
-          <td className="px-4 py-3 text-sm text-gray-900 border-b">
-            <Link 
-              href={`/board/${post.id}`}
-              className="text-blue-600 hover:text-blue-800 hover:underline"
-            >
-              {post.title}
-            </Link>
-          </td>
-          <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
-            {post.view_count}
-          </td>
-          <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
-            {formatDate(post.created_at)}
-          </td>
-        </tr>
-      );
-    }
-    
-    // 빈 행들로 10개까지 채우기
-    for (let i = posts.length; i < postsPerPage; i++) {
-      rows.push(
-        <tr key={`empty-${i}`}>
-          <td className="px-4 py-3 text-sm text-gray-900 border-b text-center">
-            &nbsp;
-          </td>
-          <td className="px-4 py-3 text-sm text-gray-900 border-b">
-            &nbsp;
-          </td>
-          <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
-            &nbsp;
-          </td>
-          <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
-            &nbsp;
-          </td>
-        </tr>
-      );
-    }
-    
-    return rows;
-  };
+const BringPostBox = ({ post }: BringPostBoxProps) => {
+    return (
+        <div className="bg-white rounded-lg border border-gray-300 p-6 mb-4">
+            {/* 게시글 헤더 */}
+            <div className="border-b border-gray-200 pb-4 mb-4">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                    {post.title}
+                </h1>
+                
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                    <div className="flex items-center gap-4">
+                        <span className="font-medium">{post.author.nickname}</span>
+                        <span>{formatDate(post.created_at)}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                        <span>조회수 {post.view_count}</span>
+                        <span>추천 {post.like_count}</span>
+                    </div>
+                </div>
+            </div>
 
-  return (
-    <div className="flex flex-5 bg-white w-full border border-gray-300 rounded">
-      {/* 로딩 상태 */}
-      {loading ? (
-        <div className="w-full p-8 text-center text-gray-500">
-          게시글을 불러오는 중...
+            {/* 게시글 내용 */}
+            <div className="prose max-w-none">
+                <div 
+                    className="text-gray-800 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: post.content }}
+                />
+            </div>
+
+            {/* 게시글 액션 */}
+            <div className="border-t border-gray-200 pt-4 mt-6">
+                <div className="flex items-center justify-center gap-4">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
+                        <span>👍</span>
+                        <span>추천 ({post.like_count})</span>
+                    </button>
+                    
+                    <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
+                        <span>📝</span>
+                        <span>수정</span>
+                    </button>
+                    
+                    <button className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors">
+                        <span>🗑️</span>
+                        <span>삭제</span>
+                    </button>
+                </div>
+            </div>
         </div>
-      ) : (
-        <table className="w-full">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b w-16">번호</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">제목</th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b w-20">조회수</th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b w-24">작성일</th>
-            </tr>
-          </thead>
-          <tbody>
-            {renderTableRows()}
-          </tbody>
-        </table>
-      )}
-    </div>
-  );
-}
+    );
+};
+
+export default BringPostBox;
