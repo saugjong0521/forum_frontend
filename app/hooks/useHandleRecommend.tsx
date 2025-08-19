@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { api } from '../api';
 import { PATH } from '../constants/path';
 import { useSessionTokenStore } from '../store/useSessionTokenStore';
-
+import { useRecommendStore } from '../store/useRecommendStore';
 
 interface UseHandleRecommendReturn {
     recommendPost: (postId: number) => Promise<boolean>;
@@ -16,6 +16,7 @@ const useHandleRecommend = (): UseHandleRecommendReturn => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { token } = useSessionTokenStore();
+    const { toggleRecommend } = useRecommendStore();
 
     const recommendPost = async (postId: number): Promise<boolean> => {
         if (!token) {
@@ -33,6 +34,8 @@ const useHandleRecommend = (): UseHandleRecommendReturn => {
                 },
             });
 
+            // 성공 시 스토어 상태 업데이트
+            toggleRecommend(postId);
             return true;
         } catch (err: any) {
             let errorMessage = '추천에 실패했습니다.';
@@ -73,6 +76,8 @@ const useHandleRecommend = (): UseHandleRecommendReturn => {
                 },
             });
 
+            // 성공 시 스토어 상태 업데이트
+            toggleRecommend(postId);
             return true;
         } catch (err: any) {
             let errorMessage = '추천 해제에 실패했습니다.';

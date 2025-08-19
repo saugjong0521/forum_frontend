@@ -215,7 +215,7 @@ export default function BringBoardBox() {
             <tr>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b w-16">번호</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">제목</th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b w-20">관리</th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b w-20"></th>
               <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b w-20">조회수</th>
               <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b w-24">작성일</th>
             </tr>
