@@ -3,7 +3,7 @@ import { PATH } from '../constants/path';
 import { api } from '../api';
 
 interface Post {
-  id: number;
+  post_id: number;
   author_id: number;
   board_id: number;
   title: string;

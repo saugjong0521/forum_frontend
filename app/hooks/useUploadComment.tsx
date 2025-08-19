@@ -15,7 +15,7 @@ interface UploadCommentRequest {
 }
 
 interface Author {
-  id: number;
+  user_id: number;
   username: string;
   nickname: string;
   created_at: string;
@@ -23,13 +23,13 @@ interface Author {
 
 interface UploadCommentResponse {
   content: string;
-  parent_id: number;
-  id: number;
+  parent_id: number | null; // null 허용으로 수정
+  comment_id: number; // id -> comment_id로 변경
   post_id: number;
   author_id: number;
   is_active: boolean;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null; // null 허용으로 수정
   author: Author;
   children: string[];
 }

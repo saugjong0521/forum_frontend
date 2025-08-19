@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 interface Post {
-  id: number;
+  post_id: number;
   author_id: number;
   currentBoardId: number | null;
   title: string;

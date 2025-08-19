@@ -16,7 +16,7 @@ export default function BringBoardBox() {
     sortBy,
     sortOrder 
   } = useBoardPostStore();
-  const { id } = useUserInfoStore();
+  const { user_id } = useUserInfoStore();
   const { deactivatePost, loading: deleteLoading, error: deleteError, clearError } = useDeactivatePost();
 
   // 페이지, 게시판, 정렬이 변경될 때마다 게시글 가져오기
@@ -102,7 +102,7 @@ export default function BringBoardBox() {
 
   // 내가 작성한 게시글인지 확인하는 함수
   const isMyPost = (post: any) => {
-    const result = id && post.author_id === id;
+    const result = user_id && post.author_id === user_id;
 
     return result;
   };
@@ -115,13 +115,13 @@ export default function BringBoardBox() {
     for (let i = 0; i < posts.length; i++) {
       const post = posts[i];
       rows.push(
-        <tr key={post.id} className="hover:bg-gray-50">
+        <tr key={post.post_id} className="hover:bg-gray-50">
           <td className="px-4 py-3 text-sm text-gray-900 border-b text-center">
-            {post.id}
+            {post.post_id}
           </td>
           <td className="px-4 py-3 text-sm text-gray-900 border-b">
             <Link 
-              href={`/board/${post.id}`}
+              href={`/board/${post.post_id}`}
               className="text-blue-600 hover:text-blue-800 hover:underline"
             >
               {post.title}
@@ -132,11 +132,11 @@ export default function BringBoardBox() {
               <button
                 onClick={() => {
                   console.log('🖱️ 삭제 버튼 클릭:', { 
-                    postId: post.id, 
+                    postId: post.post_id, 
                     postTitle: post.title,
                     postAuthorId: post.author_id 
                   });
-                  handleDelete(post.id, post.title);
+                  handleDelete(post.post_id, post.title);
                 }}
                 disabled={deleteLoading}
                 className={`px-2 py-1 text-xs rounded transition-colors ${
@@ -144,7 +144,7 @@ export default function BringBoardBox() {
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-red-100 text-red-700 hover:bg-red-200'
                 }`}
-                title={`게시글 삭제 (ID: ${post.id})`}
+                title={`게시글 삭제 (ID: ${post.post_id})`}
               >
                 {deleteLoading ? '삭제 중...' : '삭제'}
               </button>

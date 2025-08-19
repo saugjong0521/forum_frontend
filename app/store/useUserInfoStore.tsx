@@ -5,7 +5,7 @@ interface UserInfoState {
   username: string;
   email: string;
   nickname: string;
-  id: number;
+  user_id: number;
   setUserInfo: (userInfo: Partial<Omit<UserInfoState, 'setUserInfo'>>) => void;
   clearUserInfo: () => void;
 }
@@ -16,9 +16,9 @@ const useUserInfoStore = create<UserInfoState>()(
       username: '',
       email: '',
       nickname: '',
-      id: 0,
+      user_id: 0,
       setUserInfo: (userInfo) => set((prev) => ({ ...prev, ...userInfo })),
-      clearUserInfo: () => set({ username: '', email: '', nickname: '', id: 0 }),
+      clearUserInfo: () => set({ username: '', email: '', nickname: '', user_id: 0 }),
     }),
     {
       name: 'user-store',

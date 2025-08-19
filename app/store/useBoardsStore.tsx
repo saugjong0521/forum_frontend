@@ -4,7 +4,7 @@ interface Board {
   slug: string;
   name: string;
   description: string;
-  id: number;
+  board_id: number;
   is_active: boolean;
   created_at: string;
   updated_at: string | null;
@@ -50,13 +50,13 @@ export const useBoardsStore = create<BoardsNameState>((set, get) => ({
   // 유틸리티 함수들
   getBoardById: (id) => {
     const { boards } = get();
-    return boards.find(board => board.id === id);
+    return boards.find(board => board.board_id === id);
   },
   
   getBoardName: (id) => {
     if (id === null) return '전체 게시판';
     const { boards } = get();
-    const board = boards.find(board => board.id === id);
+    const board = boards.find(board => board.board_id === id);
     return board ? board.name : '게시판';
   },
 

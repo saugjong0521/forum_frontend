@@ -10,7 +10,9 @@ export const PATH = {
   DEACTIVATEPOST: (id: number) => `/posts/${id}/deactivate`,
   UPLOADCOMMENT: (id: number) => `/posts/${id}/comments`,
   GETCOMMENTS: (id: number) => `/posts/${id}/comments`,
-  DEACTIVATECOMMENT: (id: number) => `/posts/comments/${id}/deactivate`
+  DEACTIVATECOMMENT: (id: number) => `/posts/comments/${id}/deactivate`,
+  POSTRECOMMEND: (id: number) => `/posts/${id}/recommend`,
+  UNDORECOMMEND: (id: number) => `/posts/${id}/recommend`
 } as const;
 
 

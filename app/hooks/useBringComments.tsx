@@ -6,7 +6,7 @@ import { PATH } from '../constants/path';
 
 
 interface Author {
-    id: number;
+    user_id: number;
     username: string;
     nickname: string;
     created_at: string;
@@ -15,7 +15,7 @@ interface Author {
 interface Comment {
     content: string;
     parent_id: number;
-    id: number;
+    comment_id: number;
     post_id: number;
     author_id: number;
     is_active: boolean;

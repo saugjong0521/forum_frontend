@@ -20,7 +20,7 @@ interface UploadPostRequest {
 }
 
 interface UploadPostResponse {
-  id: number;
+  post_id: number;
   author_id: number;
   board_id: number;
   title: string;

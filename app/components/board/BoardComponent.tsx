@@ -134,9 +134,9 @@ export default function BoardComponent() {
               {/* 개별 게시판 버튼들 */}
               {boards.map((board) => (
                 <button
-                  key={board.id}
-                  onClick={() => handleBoardThemeClick(board.id)}
-                  className={`px-3 py-1 text-sm rounded transition-colors ${currentBoardId === board.id
+                  key={board.board_id}
+                  onClick={() => handleBoardThemeClick(board.board_id)}
+                  className={`px-3 py-1 text-sm rounded transition-colors ${currentBoardId === board.board_id
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}

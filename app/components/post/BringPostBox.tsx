@@ -1,7 +1,7 @@
 'use client';
 
 interface Author {
-    id: number;
+    user_id: number;
     username: string;
     nickname: string;
     created_at: string;

@@ -1,10 +1,10 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import useBringPost from '../../hooks/useBringPost';
 import BringPostBox from './BringPostBox';
-import CommentComponent from '../comment/CommentComponent';
+import BringCommentBox from '../comment/BringCommentBox'; // CommentComponent 대신 직접 사용
+import { usePostStore } from '@/app/store/usePostStore'; // Post Store 추가
 
 interface Author {
     id: number;
@@ -32,10 +32,10 @@ const PostComponent = () => {
     const postId = parseInt(params.id as string, 10);
     
     const { post, loading, error, bringPost, resetPost } = useBringPost();
+    const { setPost } = usePostStore(); // Post Store 사용
     const [showPasswordInput, setShowPasswordInput] = useState(false);
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
-    const [currentComments, setCurrentComments] = useState<Comment[]>([]);
 
     // 게시글 조회
     useEffect(() => {
@@ -44,12 +44,12 @@ const PostComponent = () => {
         }
     }, [postId, bringPost]);
 
-    // 게시글 로딩 성공 시 댓글 상태 초기화
+    // 게시글 로딩 성공 시 Post Store에 저장
     useEffect(() => {
-        if (post?.comments) {
-            setCurrentComments(post.comments);
+        if (post) {
+            setPost(post);
         }
-    }, [post?.comments]);
+    }, [post, setPost]);
 
     // 에러 처리
     useEffect(() => {
@@ -69,24 +69,17 @@ const PostComponent = () => {
         }
     }, [post, loading, error]);
 
-    // 댓글 업데이트 핸들러
-    const handleCommentsUpdate = (updatedComments: Comment[]) => {
-        setCurrentComments(updatedComments);
-    };
-
     // 비밀번호 입력 처리
     const handlePasswordSubmit = () => {
         if (!password.trim()) {
             setPasswordError('비밀번호를 입력해주세요.');
             return;
         }
-
         const passwordNum = parseInt(password);
         if (isNaN(passwordNum) || password.length !== 4) {
             setPasswordError('4자리 숫자를 입력해주세요.');
             return;
         }
-
         bringPost({ post_id: postId, password: passwordNum });
         setPassword('');
     };
@@ -95,6 +88,14 @@ const PostComponent = () => {
     const handleGoBack = () => {
         router.back();
     };
+
+    // 컴포넌트 언마운트 시 Post Store 초기화 (선택사항)
+    useEffect(() => {
+        return () => {
+            // 필요한 경우 컴포넌트 언마운트 시 초기화
+            // setPost(null);
+        };
+    }, []);
 
     // 로딩 상태
     if (loading) {
@@ -206,11 +207,15 @@ const PostComponent = () => {
                     {/* 게시글 박스 */}
                     <BringPostBox post={post} />
                     
-                    {/* 댓글 컴포넌트 */}
-                    <CommentComponent 
-                        comments={currentComments} 
-                        postId={postId}
-                        onCommentsUpdate={handleCommentsUpdate}
+                    {/* 댓글 컴포넌트 - props 없이 사용 */}
+                    <BringCommentBox 
+                        onCommentAdded={(newComment) => {
+                            console.log('새 댓글 추가됨:', newComment);
+                            // 필요한 경우 추가 로직 (예: 알림, 통계 업데이트 등)
+                        }}
+                        onCommentDeleted={(commentId) => {
+                            console.log('댓글 삭제됨:', commentId);
+                        }}
                     />
                 </div>
             </div>

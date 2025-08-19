@@ -43,13 +43,13 @@ export default function RecentBoardComponent({
     for (let i = 0; i < posts.length; i++) {
       const post = posts[i];
       rows.push(
-        <tr key={post.id} className="hover:bg-gray-50 h-[35px]">
+        <tr key={post.post_id} className="hover:bg-gray-50 h-[35px]">
           <td className="px-2 text-xs text-gray-600 border-b border-gray-300 text-center w-12 align-middle">
-            {post.id}
+            {post.post_id}
           </td>
           <td className="px-2 text-xs text-gray-900 border-b border-gray-300 align-middle">
             <Link 
-              href={`/board/${post.id}`}
+              href={`/board/${post.post_id}`}
               className="text-blue-600 hover:text-blue-800 hover:underline block"
               title={post.title}
             >
