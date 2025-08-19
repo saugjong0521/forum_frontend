@@ -6,8 +6,11 @@ export const PATH = {
   UPLOADPOST: "/posts",
   GETBOARD: "/posts",
   GETPOST: (id: number) => `/posts/${id}`,
+  GETBOARDNAME: "/boards",
+  DEACTIVATEPOST: (id: number) => `/posts/${id}/deactivate`,
   UPLOADCOMMENT: (id: number) => `/posts/${id}/comments`,
-  GETBOARDNAME: "/boards"
+  GETCOMMENTS: (id: number) => `/posts/${id}/comments`,
+  DEACTIVATECOMMENT: (id: number) => `/posts/comments/${id}/deactivate`
 } as const;
 
 

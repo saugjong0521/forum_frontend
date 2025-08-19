@@ -52,7 +52,7 @@ interface BoardState {
   resetBoard: () => void;
 }
 
-export const useBoardStore = create<BoardState>((set, get) => ({
+export const useBoardPostStore = create<BoardState>((set, get) => ({
   // 초기 상태
   currentBoardId: null, // null로 기본값 설정 (board_id 없음)
   postsPerPage: 10,

@@ -4,14 +4,15 @@ import { useEffect } from 'react';
 import Link from "next/link";
 import { useRouter, useSearchParams } from 'next/navigation';
 import BringBoardBox from './BringBoardBox';
-import { useBoardStore } from '../../store/useBoardStore'; // 게시글 관련
-import { useBoardsNameStore } from '../../store/useBoardsNameStore'; // 게시판 목록 관련
-import { useBringBoardsName } from '@/app/hooks/usedBringBoardsName';
+import { useBoardPostStore } from '../../store/useBoardPostStore'; // 게시글 관련
+import { useBoardsStore } from '../../store/useBoardsStore'; // 게시판 목록 관련
+import { useBringBoards } from '@/app/hooks/useBringBoards';
+import { useUserInfoStore } from '@/app/store/useUserInfoStore';
 
 export default function BoardComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // 게시글 관련 store
   const {
     currentPage,
@@ -25,11 +26,12 @@ export default function BoardComponent() {
     setSorting,
     resetBoard,
     setBoardId
-  } = useBoardStore();
+  } = useBoardPostStore();
 
   // 게시판 목록 관련 store & hook
-  const { getBoardName } = useBoardsNameStore();
-  const { boards, bringBoardsName, loading: boardsLoading, error: boardsError } = useBringBoardsName();
+  const { getBoardName } = useBoardsStore();
+  const { boards, bringBoardsName, loading: boardsLoading, error: boardsError } = useBringBoards();
+
 
   // 컴포넌트 마운트 시 게시판 목록 가져오기
   useEffect(() => {
@@ -61,7 +63,7 @@ export default function BoardComponent() {
   useEffect(() => {
     updatePageInURL(currentPage);
   }, [currentPage]);
-  
+
   // 이전/다음 페이지 핸들러
   const handlePrevPage = () => {
     goToPrevPage();
@@ -73,7 +75,7 @@ export default function BoardComponent() {
 
   // 정렬 변경 핸들러
   const handleSortChange = (newSortBy: string, newSortOrder: string) => {
-    console.log('정렬 변경:', { 
+    console.log('정렬 변경:', {
       이전: { sortBy, sortOrder },
       새로운: { newSortBy, newSortOrder }
     });
@@ -83,12 +85,12 @@ export default function BoardComponent() {
   // select 변경 핸들러
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     console.log('select 변경됨:', e.target.value);
-    
+
     const value = e.target.value;
     const lastUnderscoreIndex = value.lastIndexOf('_');
     const newSortBy = value.substring(0, lastUnderscoreIndex);
     const newSortOrder = value.substring(lastUnderscoreIndex + 1);
-    
+
     console.log('분할된 값:', { newSortBy, newSortOrder });
     handleSortChange(newSortBy, newSortOrder);
   };
@@ -109,7 +111,7 @@ export default function BoardComponent() {
     <>
       {/* 게시판 헤더 */}
       <div className="w-full bg-white p-4 flex justify-between items-center">
-        
+
         {/* 게시판 네비게이션 */}
         <div className="flex items-center gap-2">
           {boardsLoading ? (
@@ -121,25 +123,23 @@ export default function BoardComponent() {
               {/* 전체 게시판 버튼 */}
               <button
                 onClick={handleAllBoardsClick}
-                className={`px-3 py-1 text-sm rounded transition-colors ${
-                  currentBoardId === null
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+                className={`px-3 py-1 text-sm rounded transition-colors ${currentBoardId === null
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
               >
                 전체
               </button>
-              
+
               {/* 개별 게시판 버튼들 */}
               {boards.map((board) => (
                 <button
                   key={board.id}
                   onClick={() => handleBoardThemeClick(board.id)}
-                  className={`px-3 py-1 text-sm rounded transition-colors ${
-                    currentBoardId === board.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                  className={`px-3 py-1 text-sm rounded transition-colors ${currentBoardId === board.id
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
                 >
                   {board.name}
                 </button>
@@ -147,14 +147,14 @@ export default function BoardComponent() {
             </>
           )}
         </div>
-        
+
         <h2 className="text-xl font-bold text-[#000]">{getBoardName(currentBoardId)}</h2>
-        
+
         {/* 정렬 옵션 */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-[#000]">정렬:</span>
-          
-          <select 
+
+          <select
             value={`${sortBy}_${sortOrder}`}
             onChange={handleSelectChange}
             className="text-sm border text-[#000] rounded px-2 py-1"
@@ -179,22 +179,22 @@ export default function BoardComponent() {
             <p className="text-[#fff]">글쓰기</p>
           </Link>
         </div>
-        
+
         {/* 페이지네이션 */}
         <div className="flex flex-1 bg-white gap-6 justify-center items-center">
-          <button 
+          <button
             onClick={handlePrevPage}
             disabled={currentPage === 1}
             className={`text-3xl ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-black hover:text-blue-600'}`}
           >
             &#x300A;
           </button>
-          
+
           <span className="text-lg text-gray-700">
             페이지 {currentPage}
           </span>
-          
-          <button 
+
+          <button
             onClick={handleNextPage}
             disabled={!hasNextPage}
             className={`text-3xl ${!hasNextPage ? 'text-gray-300 cursor-not-allowed' : 'text-black hover:text-blue-600'}`}

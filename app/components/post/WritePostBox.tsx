@@ -5,7 +5,7 @@ import { SlateTextEditor, } from "@/app/components";
 import { useRouter } from 'next/navigation';
 import { useUploadPost } from '../../hooks/useUploadPost';
 import { useUserInfoStore } from '../../store/useUserInfoStore';
-import { useBoardStore } from '../../store/useBoardStore';
+import { useBoardPostStore } from '../../store/useBoardPostStore';
 import { SlateTextEditorRef } from './SlateTextEditor';
 
 export default function WritePostBox() {
@@ -13,7 +13,7 @@ export default function WritePostBox() {
     const editorRef = useRef<SlateTextEditorRef>(null);
     const { uploadPost, loading, error } = useUploadPost();
     const { username } = useUserInfoStore();
-    const { currentBoardId } = useBoardStore();
+    const { currentBoardId } = useBoardPostStore();
 
     // 폼 상태 관리
     const [title, setTitle] = useState('');

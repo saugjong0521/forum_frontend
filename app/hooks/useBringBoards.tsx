@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { PATH } from '../constants/path';
 import { api } from '../api';
-import { useBoardsNameStore } from '../store/useBoardsNameStore';
+import { useBoardsStore } from '../store/useBoardsStore';
 
 interface Board {
   slug: string;
@@ -19,7 +19,7 @@ interface GetBoardsParams {
   forceRefresh?: boolean; // 강제 새로고침 옵션
 }
 
-export const useBringBoardsName = () => {
+export const useBringBoards = () => {
   const {
     boards,
     loading,
@@ -27,7 +27,7 @@ export const useBringBoardsName = () => {
     setBoards,
     setLoading,
     setError,
-  } = useBoardsNameStore();
+  } = useBoardsStore();
 
   const bringBoardsName = useCallback(async (params: GetBoardsParams = {}) => {
 

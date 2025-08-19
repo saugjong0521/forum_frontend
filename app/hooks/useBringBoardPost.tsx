@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { PATH } from '../constants/path';
 import { api } from '../api';
-import { useBoardStore } from '../store/useBoardStore';
+import { useBoardPostStore } from '../store/useBoardPostStore';
 
 interface GetBoardParams {
   skip?: number;
@@ -11,7 +11,7 @@ interface GetBoardParams {
   sort_order?: string;
 }
 
-export const useBringBoard = () => {
+export const useBringBoardPost = () => {
   const {
     posts,
     loading,
@@ -24,7 +24,7 @@ export const useBringBoard = () => {
     setLoading,
     setError,
     setHasNextPage,
-  } = useBoardStore();
+  } = useBoardPostStore();
 
   const bringboard = useCallback(async (params: GetBoardParams = {}) => {
     setLoading(true);

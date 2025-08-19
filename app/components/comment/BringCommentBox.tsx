@@ -1,7 +1,8 @@
 'use client';
-
 import useUploadComment from '@/app/hooks/useUploadComment';
+import useBringComments from '@/app/hooks/useBringComments'; // 새로 만든 훅 import
 import { useState } from 'react';
+import { usePostStore } from '@/app/store/usePostStore';
 
 interface Author {
     id: number;
@@ -24,8 +25,7 @@ interface Comment {
 }
 
 interface BringCommentBoxProps {
-    comments: Comment[];
-    postId: number;
+    // comments와 postId는 더 이상 props로 받지 않음 (훅에서 처리)
     onCommentAdded?: (newComment: Comment) => void; // 댓글 추가 후 콜백
     onCommentUpdated?: (updatedComment: Comment) => void; // 댓글 수정 후 콜백
     onCommentDeleted?: (commentId: number) => void; // 댓글 삭제 후 콜백
@@ -43,63 +43,61 @@ const formatDate = (dateString: string) => {
 };
 
 const BringCommentBox = ({ 
-    comments, 
-    postId, 
     onCommentAdded, 
     onCommentUpdated, 
     onCommentDeleted 
 }: BringCommentBoxProps) => {
     const [newComment, setNewComment] = useState('');
-    const [replyingTo, setReplyingTo] = useState<number | null>(null);
-    const [replyContent, setReplyContent] = useState('');
+
     const [editingComment, setEditingComment] = useState<number | null>(null);
     const [editContent, setEditContent] = useState('');
     
-    const { uploadComment, loading, error, clearError } = useUploadComment();
+    // 훅들
+    const { uploadComment, loading: uploadLoading, error: uploadError, clearError: clearUploadError } = useUploadComment();
+    const { comments, loading: commentsLoading, error: commentsError, refetch, clearError: clearCommentsError } = useBringComments();
+    const { post } = usePostStore(); // 추가
+
+    // 로딩 상태 통합
+    const loading = uploadLoading || commentsLoading;
+    
+    // 에러 상태 통합
+    const error = uploadError || commentsError;
+    
+    // 에러 클리어 함수 통합
+    const clearError = () => {
+        clearUploadError();
+        clearCommentsError();
+    };
 
     // 새 댓글 작성
     const handleSubmitComment = async () => {
         if (!newComment.trim()) return;
         
+        if (!post?.id) {
+            alert('게시글 정보를 찾을 수 없습니다.');
+            return;
+        }
+        
         const result = await uploadComment({
-            post_id: postId,
+            post_id: post.id,
             content: newComment
         });
-
+        
         if (result) {
             setNewComment('');
             clearError();
+            
+            // 댓글 목록 새로고침
+            await refetch();
             
             // 부모 컴포넌트에 새 댓글 추가 알림
             if (onCommentAdded) {
                 onCommentAdded(result);
             }
-            
         }
     };
 
-    // 대댓글 작성
-    const handleSubmitReply = async (parentId: number) => {
-        if (!replyContent.trim()) return;
-        
-        const result = await uploadComment({
-            post_id: postId,
-            content: replyContent,
-            parent_id: parentId
-        });
 
-        if (result) {
-            setReplyContent('');
-            setReplyingTo(null);
-            clearError();
-            
-            // 부모 컴포넌트에 새 대댓글 추가 알림
-            if (onCommentAdded) {
-                onCommentAdded(result);
-            }
-            
-        }
-    };
 
     // 댓글 수정 시작
     const handleStartEdit = (comment: Comment) => {
@@ -132,6 +130,10 @@ const BringCommentBox = ({
         
         setEditingComment(null);
         setEditContent('');
+        
+        // 댓글 목록 새로고침
+        await refetch();
+        
         alert('댓글이 수정되었습니다!');
     };
 
@@ -142,6 +144,9 @@ const BringCommentBox = ({
         // TODO: useDeleteComment 훅 구현 후 실제 삭제 로직 추가
         console.log('댓글 삭제:', commentId);
         
+        // 댓글 목록 새로고침
+        await refetch();
+        
         // 임시로 부모에게 삭제 알림
         if (onCommentDeleted) {
             onCommentDeleted(commentId);
@@ -150,30 +155,31 @@ const BringCommentBox = ({
         alert('댓글이 삭제되었습니다!');
     };
 
-    const renderComment = (comment: Comment, isReply = false) => (
-        <div 
-            key={comment.id} 
-            className={`border-b border-gray-100 py-4 ${isReply ? 'ml-8 pl-4 border-l-2 border-blue-200' : ''}`}
-        >
-            <div className="flex items-center justify-between mb-2">
+    const renderComment = (comment: Comment) => (
+        <div key={comment.id} className="border-b border-gray-200 py-4">
+            <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-900">{comment.author.nickname}</span>
-                    <span className="text-sm text-gray-500">{formatDate(comment.created_at)}</span>
-                    {comment.updated_at !== comment.created_at && (
-                        <span className="text-xs text-gray-400">(수정됨)</span>
-                    )}
+                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-medium text-gray-600">
+                            {comment.author.nickname?.charAt(0) || 'U'}
+                        </span>
+                    </div>
+                    <div>
+                        <span className="font-medium text-gray-900">
+                            {comment.author.nickname}
+                        </span>
+                        <span className="text-sm text-gray-500 ml-2">
+                            {formatDate(comment.created_at)}
+                        </span>
+                        {comment.updated_at !== comment.created_at && (
+                            <span className="text-xs text-gray-400 ml-1">
+                                (수정됨)
+                            </span>
+                        )}
+                    </div>
                 </div>
                 
                 <div className="flex items-center gap-2">
-                    {!isReply && (
-                        <button 
-                            onClick={() => setReplyingTo(comment.id)}
-                            className="text-sm text-blue-600 hover:text-blue-800"
-                            disabled={loading}
-                        >
-                            답글
-                        </button>
-                    )}
                     <button 
                         onClick={() => handleStartEdit(comment)}
                         className="text-sm text-gray-600 hover:text-gray-800"
@@ -193,7 +199,7 @@ const BringCommentBox = ({
             
             {/* 댓글 내용 또는 수정 입력창 */}
             {editingComment === comment.id ? (
-                <div className="mb-3">
+                <div className="mt-2">
                     <textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
@@ -223,54 +229,26 @@ const BringCommentBox = ({
                     {comment.content}
                 </div>
             )}
-
-            {/* 대댓글 입력창 */}
-            {replyingTo === comment.id && (
-                <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                    <textarea
-                        value={replyContent}
-                        onChange={(e) => setReplyContent(e.target.value)}
-                        placeholder="답글을 입력하세요..."
-                        className="w-full p-2 border border-gray-300 rounded resize-none"
-                        rows={3}
-                        disabled={loading}
-                    />
-                    {error && (
-                        <div className="text-red-600 text-sm mt-1">
-                            {error}
-                        </div>
-                    )}
-                    <div className="flex justify-end gap-2 mt-2">
-                        <button 
-                            onClick={() => {
-                                setReplyingTo(null);
-                                setReplyContent('');
-                                clearError();
-                            }}
-                            className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
-                            disabled={loading}
-                        >
-                            취소
-                        </button>
-                        <button 
-                            onClick={() => handleSubmitReply(comment.id)}
-                            disabled={loading || !replyContent.trim()}
-                            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            {loading ? '작성 중...' : '답글 작성'}
-                        </button>
-                    </div>
-                </div>
-            )}
         </div>
     );
+
+    // 로딩 상태 표시
+    if (commentsLoading && comments.length === 0) {
+        return (
+            <div className="bg-white rounded-lg border border-[#888] text-[#000] p-6">
+                <div className="text-center py-8">
+                    <div className="text-gray-500">댓글을 불러오는 중...</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white rounded-lg border border-[#888] text-[#000] p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4">
                 댓글 ({comments.length})
             </h3>
-
+            
             {/* 댓글 작성 */}
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                 <textarea

@@ -1,56 +1,40 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { PATH } from '../constants/path';
 import { api } from '../api';
 import { useSessionTokenStore } from '../store/useSessionTokenStore';
+import { usePostStore } from '../store/usePostStore';
 
 interface GetPostParams {
     post_id: number;    // 필수
     password?: number;  // 선택사항
-}
-
-interface Author {
-    id: number;
-    username: string;
-    nickname: string;
-    created_at: string;
-}
-
-interface Comment {
-    content: string;
-    parent_id: number;
-    id: number;
-    post_id: number;
-    author_id: number;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
-    author: Author;
-    children: string[];
-}
-
-interface Post {
-    title: string;
-    content: string;
-    board_id: number;
-    password: string;
-    id: number;
-    author_id: number;
-    view_count: number;
-    like_count: number;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
-    author: Author;
-    comments: Comment[];
+    forceRefresh?: boolean; // 강제 새로고침
 }
 
 const useBringPost = () => {
-    const [post, setPost] = useState<Post | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const {
+        post,
+        loading,
+        error,
+        setPost,
+        setLoading,
+        setError,
+        shouldRefetch,
+    } = usePostStore();
+    
     const { token } = useSessionTokenStore();
 
     const bringPost = useCallback(async (params: GetPostParams) => {
+        const { forceRefresh = false } = params;
+        
+        // 캐시된 데이터가 있고 강제 새로고침이 아니며 같은 게시글이고 만료되지 않았다면 return
+        if (!forceRefresh && 
+            post && 
+            post.id === params.post_id && 
+            !shouldRefetch()) {
+            console.log('useBringPost: 캐시된 데이터 사용');
+            return post;
+        }
+
         setLoading(true);
         setError(null);
 
@@ -60,6 +44,16 @@ const useBringPost = () => {
             if (params.password !== undefined) {
                 queryParams.password = params.password;
             }
+
+            console.log('useBringPost API 호출:', {
+                post_id: params.post_id,
+                queryParams,
+                forceRefresh,
+                캐시상태: {
+                    기존_post_id: post?.id,
+                    shouldRefetch: shouldRefetch(),
+                }
+            });
 
             const response = await api.get(PATH.GETPOST(params.post_id), {
                 params: queryParams,
@@ -71,7 +65,7 @@ const useBringPost = () => {
             setPost(response.data);
             return response.data;
         } catch (err: any) {
-            let errorMessage = '게시글을 가져오는데 실패했습니다.';
+            let errorMessage = '게시물을 보기 위해선 로그인이 필요합니다.';
             
             if (err.response?.status === 403) {
                 errorMessage = 'PASSWORD_REQUIRED'; // 컴포넌트에서 구분할 수 있도록
@@ -88,13 +82,17 @@ const useBringPost = () => {
         } finally {
             setLoading(false);
         }
-    }, [token]);
+    }, [post, shouldRefetch, setPost, setLoading, setError, token]);
+
+    // 강제 새로고침 함수
+    const refreshPost = useCallback(async (postId: number, password?: number) => {
+        return await bringPost({ post_id: postId, password, forceRefresh: true });
+    }, [bringPost]);
 
     // 상태 초기화 함수
     const resetPost = useCallback(() => {
-        setPost(null);
-        setError(null);
-        setLoading(false);
+        const { reset } = usePostStore.getState();
+        reset();
     }, []);
 
     return {
@@ -102,6 +100,7 @@ const useBringPost = () => {
         loading,
         error,
         bringPost,
+        refreshPost,
         resetPost,
     };
 };

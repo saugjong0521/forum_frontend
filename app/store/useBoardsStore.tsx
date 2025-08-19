@@ -31,7 +31,7 @@ interface BoardsNameState {
   reset: () => void;
 }
 
-export const useBoardsNameStore = create<BoardsNameState>((set, get) => ({
+export const useBoardsStore = create<BoardsNameState>((set, get) => ({
   // 초기 상태
   boards: [],
   loading: false,

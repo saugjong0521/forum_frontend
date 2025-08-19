@@ -2,18 +2,22 @@
 
 import { useEffect } from 'react';
 import Link from "next/link";
-import { useBringBoard } from '../../hooks/useBringBoard';
-import { useBoardStore } from '../../store/useBoardStore';
+import { useBringBoardPost } from '../../hooks/useBringBoardPost';
+import { useBoardPostStore } from '../../store/useBoardPostStore';
+import { useUserInfoStore } from '@/app/store/useUserInfoStore';
+import useDeactivatePost from '../../hooks/useDeactivatePost';
 
 export default function BringBoardBox() {
-  const { posts, bringboard, loading, error } = useBringBoard();
+  const { posts, bringboard, loading, error } = useBringBoardPost();
   const { 
     currentPage, 
     postsPerPage, 
     currentBoardId, 
-    sortBy, 
+    sortBy,
     sortOrder 
-  } = useBoardStore();
+  } = useBoardPostStore();
+  const { id } = useUserInfoStore();
+  const { deactivatePost, loading: deleteLoading, error: deleteError, clearError } = useDeactivatePost();
 
   // 페이지, 게시판, 정렬이 변경될 때마다 게시글 가져오기
   useEffect(() => {
@@ -24,6 +28,7 @@ export default function BringBoardBox() {
       sortOrder,
       postsPerPage
     });
+    console.log('현재 posts:', posts);
 
     const skip = (currentPage - 1) * postsPerPage;
     const params = { 
@@ -31,13 +36,60 @@ export default function BringBoardBox() {
       limit: postsPerPage,
       sort_by: sortBy,
       sort_order: sortOrder,
-      ...(currentBoardId !== null && { board_id: currentBoardId }) // null이 아닐 때만 포함
+      ...(currentBoardId !== null && { board_id: currentBoardId })
     };
 
     console.log('API 호출 파라미터:', params);
     
     bringboard(params);
   }, [currentPage, currentBoardId, sortBy, sortOrder, bringboard, postsPerPage]);
+
+  // 게시글 삭제 핸들러 (디버깅 추가)
+  const handleDelete = async (postId: number, postTitle: string) => {
+    console.log('🗑️ 삭제 시도:', { postId, postTitle, typeof: typeof postId });
+    
+    // 삭제 확인
+    const isConfirmed = window.confirm(`"${postTitle}" 게시글을 정말 삭제하시겠습니까?\n게시글 ID: ${postId}`);
+    if (!isConfirmed) return;
+
+    // 에러 초기화
+    clearError();
+
+    try {
+      console.log('🔄 deactivePost 호출 전:', { post_id: postId });
+      
+      // 게시글 삭제 요청 (비밀번호 없음)
+      const success = await deactivatePost({
+        post_id: postId
+      });
+
+      console.log('✅ deactivePost 결과:', { success, deleteError });
+
+      if (success) {
+        alert('게시글이 삭제되었습니다.');
+        
+        // 게시글 목록 새로고침
+        const skip = (currentPage - 1) * postsPerPage;
+        const params = { 
+          skip, 
+          limit: postsPerPage,
+          sort_by: sortBy,
+          sort_order: sortOrder,
+          ...(currentBoardId !== null && { board_id: currentBoardId })
+        };
+        
+        console.log('🔄 삭제 후 새로고침 파라미터:', params);
+        bringboard(params);
+      } else if (deleteError) {
+        console.error('❌ 삭제 실패:', deleteError);
+        alert(deleteError);
+      }
+      
+    } catch (error) {
+      console.error('❌ 게시글 삭제 오류:', error);
+      alert('게시글 삭제에 실패했습니다.');
+    }
+  };
 
   // 날짜 포맷 함수
   const formatDate = (dateString: string) => {
@@ -46,6 +98,13 @@ export default function BringBoardBox() {
       month: '2-digit',
       day: '2-digit'
     });
+  };
+
+  // 내가 작성한 게시글인지 확인하는 함수
+  const isMyPost = (post: any) => {
+    const result = id && post.author_id === id;
+
+    return result;
   };
 
   // 10개 행을 채우기 위한 빈 행 생성 함수
@@ -67,6 +126,31 @@ export default function BringBoardBox() {
             >
               {post.title}
             </Link>
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
+            {isMyPost(post) ? (
+              <button
+                onClick={() => {
+                  console.log('🖱️ 삭제 버튼 클릭:', { 
+                    postId: post.id, 
+                    postTitle: post.title,
+                    postAuthorId: post.author_id 
+                  });
+                  handleDelete(post.id, post.title);
+                }}
+                disabled={deleteLoading}
+                className={`px-2 py-1 text-xs rounded transition-colors ${
+                  deleteLoading 
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-red-100 text-red-700 hover:bg-red-200'
+                }`}
+                title={`게시글 삭제 (ID: ${post.id})`}
+              >
+                {deleteLoading ? '삭제 중...' : '삭제'}
+              </button>
+            ) : (
+              <span className="text-gray-400">-</span>
+            )}
           </td>
           <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
             {post.view_count}
@@ -94,6 +178,9 @@ export default function BringBoardBox() {
           <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
             &nbsp;
           </td>
+          <td className="px-4 py-3 text-sm text-gray-500 border-b text-center">
+            &nbsp;
+          </td>
         </tr>
       );
     }
@@ -110,6 +197,13 @@ export default function BringBoardBox() {
         </div>
       )}
       
+      {/* 삭제 에러 표시 */}
+      {deleteError && (
+        <div className="w-full p-2 bg-red-50 text-red-600 text-sm text-center border-b">
+          삭제 에러: {deleteError}
+        </div>
+      )}
+      
       {/* 로딩 상태 */}
       {loading ? (
         <div className="w-full p-8 text-center text-gray-500">
@@ -121,6 +215,7 @@ export default function BringBoardBox() {
             <tr>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b w-16">번호</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">제목</th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b w-20">관리</th>
               <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b w-20">조회수</th>
               <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b w-24">작성일</th>
             </tr>

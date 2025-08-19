@@ -1,6 +1,5 @@
 'use client'
 
-import { useBoardStore } from "@/app/store/useBoardStore";
 import Link from "next/link";
 import React from "react";
 
