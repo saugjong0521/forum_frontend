@@ -1,12 +1,27 @@
 'use client';
 import { useState, useEffect } from 'react';
 import useHandleRecommend from '@/app/hooks/useHandleRecommend';
+import { usePostStore } from '@/app/store/usePostStore';
 
+// usePostStore에서 타입을 추출해서 사용
 interface Author {
-    id: number;
+    user_id: number;
     username: string;
     nickname: string;
     created_at: string;
+}
+
+interface Comment {
+    content: string;
+    parent_id: number;
+    comment_id: number;
+    post_id: number;
+    author_id: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    author: Author;
+    children: string[];
 }
 
 interface Post {
@@ -14,7 +29,7 @@ interface Post {
     content: string;
     board_id: number;
     password: string;
-    id: number;
+    post_id: number;
     author_id: number;
     view_count: number;
     like_count: number;
@@ -22,11 +37,13 @@ interface Post {
     created_at: string;
     updated_at: string;
     author: Author;
+    comments: Comment[];
 }
+
 
 interface BringPostBoxProps {
     post: Post;
-    onPostUpdate?: (updatedPost: Post) => void; // 게시글 업데이트 콜백
+    onPostUpdate?: (updatedPost: Post) => void;
 }
 
 const formatDate = (dateString: string) => {
@@ -42,7 +59,7 @@ const formatDate = (dateString: string) => {
 
 const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
     const [currentLikeCount, setCurrentLikeCount] = useState(post.like_count);
-    const [isRecommended, setIsRecommended] = useState(false); // 추천 상태 (실제로는 서버에서 가져와야 함)
+    const [isRecommended, setIsRecommended] = useState(false);
     
     const { recommendPost, undoRecommend, loading, error, clearError } = useHandleRecommend();
 
@@ -53,7 +70,7 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
 
     // 추천하기
     const handleRecommend = async () => {
-        const success = await recommendPost(post.id);
+        const success = await recommendPost(post.post_id); // post_id 사용
         
         if (success) {
             setCurrentLikeCount(prev => prev + 1);
@@ -72,7 +89,7 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
 
     // 추천 해제
     const handleUndoRecommend = async () => {
-        const success = await undoRecommend(post.id);
+        const success = await undoRecommend(post.post_id); // post_id 사용
         
         if (success) {
             setCurrentLikeCount(prev => prev - 1);
