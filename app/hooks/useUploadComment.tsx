@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { PATH } from '../constants/path';
 import { api } from '../api';
 import { useSessionTokenStore } from '../store/useSessionTokenStore';
+import { Comment, Author } from '@/app/store/useCommentStore'; // 공통 타입 import
 
 interface UploadCommentParams {
   post_id: number;
@@ -14,24 +15,18 @@ interface UploadCommentRequest {
   parent_id: number;
 }
 
-interface Author {
-  user_id: number;
-  username: string;
-  nickname: string;
-  created_at: string;
-}
-
+// Comment와 Author는 useCommentStore에서 import해서 사용
 interface UploadCommentResponse {
   content: string;
-  parent_id: number | null; // null 허용으로 수정
-  comment_id: number; // id -> comment_id로 변경
+  parent_id: number | null;
+  comment_id: number;
   post_id: number;
   author_id: number;
   is_active: boolean;
   created_at: string;
-  updated_at: string | null; // null 허용으로 수정
+  updated_at: string | null;
   author: Author;
-  children: string[];
+  children: Comment[]; // useCommentStore의 Comment 타입 사용
 }
 
 const useUploadComment = () => {

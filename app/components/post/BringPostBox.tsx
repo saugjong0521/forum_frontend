@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import useHandleRecommend from '@/app/hooks/useHandleRecommend';
 import { usePostStore } from '@/app/store/usePostStore';
 
-// usePostStore에서 타입을 추출해서 사용
+// 공통 타입 정의 (다른 컴포넌트들과 일치하도록)
 interface Author {
     user_id: number;
     username: string;
@@ -13,33 +13,32 @@ interface Author {
 
 interface Comment {
     content: string;
-    parent_id: number;
+    parent_id: number | null;
     comment_id: number;
     post_id: number;
     author_id: number;
     is_active: boolean;
     created_at: string;
-    updated_at: string;
+    updated_at: string | null;
     author: Author;
-    children: string[];
+    children: Comment[];
 }
 
 interface Post {
     title: string;
     content: string;
     board_id: number;
-    password: string;
+    password?: string;
     post_id: number;
     author_id: number;
     view_count: number;
     like_count: number;
     is_active: boolean;
     created_at: string;
-    updated_at: string;
+    updated_at: string | null;
     author: Author;
-    comments: Comment[];
+    comments?: Comment[];
 }
-
 
 interface BringPostBoxProps {
     post: Post;
@@ -70,10 +69,16 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
 
     // 추천하기
     const handleRecommend = async () => {
-        const success = await recommendPost(post.post_id); // post_id 사용
+        if (!post?.post_id) {
+            console.error('게시글 ID가 없습니다.');
+            return;
+        }
+
+        const success = await recommendPost(post.post_id);
         
         if (success) {
-            setCurrentLikeCount(prev => prev + 1);
+            const newLikeCount = currentLikeCount + 1;
+            setCurrentLikeCount(newLikeCount);
             setIsRecommended(true);
             clearError();
             
@@ -81,7 +86,7 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
             if (onPostUpdate) {
                 onPostUpdate({
                     ...post,
-                    like_count: currentLikeCount + 1
+                    like_count: newLikeCount
                 });
             }
         }
@@ -89,10 +94,16 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
 
     // 추천 해제
     const handleUndoRecommend = async () => {
-        const success = await undoRecommend(post.post_id); // post_id 사용
+        if (!post?.post_id) {
+            console.error('게시글 ID가 없습니다.');
+            return;
+        }
+
+        const success = await undoRecommend(post.post_id);
         
         if (success) {
-            setCurrentLikeCount(prev => prev - 1);
+            const newLikeCount = currentLikeCount - 1;
+            setCurrentLikeCount(newLikeCount);
             setIsRecommended(false);
             clearError();
             
@@ -100,11 +111,22 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
             if (onPostUpdate) {
                 onPostUpdate({
                     ...post,
-                    like_count: currentLikeCount - 1
+                    like_count: newLikeCount
                 });
             }
         }
     };
+
+    // post가 없는 경우 에러 처리
+    if (!post) {
+        return (
+            <div className="bg-white rounded-lg border border-[#000] p-6 mb-4">
+                <div className="text-center text-gray-500">
+                    게시글을 불러올 수 없습니다.
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white rounded-lg border border-[#000] p-6 mb-4">
@@ -116,12 +138,14 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
                 
                 <div className="flex items-center justify-between text-sm text-gray-600">
                     <div className="flex items-center gap-4">
-                        <span className="font-medium">{post.author.nickname}</span>
+                        <span className="font-medium">
+                            {post.author?.nickname || '익명'}
+                        </span>
                         <span>{formatDate(post.created_at)}</span>
                     </div>
                     
                     <div className="flex items-center gap-4">
-                        <span>조회수 {post.view_count}</span>
+                        <span>조회수 {post.view_count || 0}</span>
                         <span>추천 {currentLikeCount}</span>
                     </div>
                 </div>
@@ -131,7 +155,7 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
             <div className="prose max-w-none mb-6">
                 <div 
                     className="text-gray-800 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: post.content }}
+                    dangerouslySetInnerHTML={{ __html: post.content || '' }}
                 />
             </div>
 

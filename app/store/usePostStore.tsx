@@ -9,15 +9,15 @@ interface Author {
 
 interface Comment {
     content: string;
-    parent_id: number;
+    parent_id: number | null;
     comment_id: number;
     post_id: number;
     author_id: number;
     is_active: boolean;
     created_at: string;
-    updated_at: string;
+    updated_at: string | null;
     author: Author;
-    children: string[];
+    children: Comment[]; // 트리 구조를 위한 Comment 배열
 }
 
 interface Post {

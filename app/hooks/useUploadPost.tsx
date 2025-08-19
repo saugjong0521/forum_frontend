@@ -16,7 +16,7 @@ interface UploadPostRequest {
   title: string;
   content: string;
   board_id: number;
-  password: number | null; // null 허용
+  password: string | null; // string으로 변경
 }
 
 interface UploadPostResponse {
@@ -28,7 +28,7 @@ interface UploadPostResponse {
   view_count: number;
   like_count: number;
   is_active: boolean;
-  password: number | null;
+  password: string | null; // string으로 변경
   created_at: string;
   updated_at: string;
 }
@@ -69,10 +69,10 @@ export const useUploadPost = () => {
       return null;
     }
 
-    // 패스워드 처리: 공란이면 null, 아니면 숫자로 변환
+    // 패스워드 처리: 공란이면 null, 아니면 문자열 그대로 전송
     const processedPassword = params.password.trim() === '' 
       ? null 
-      : parseInt(params.password, 10);
+      : params.password.trim();
 
     const postData: UploadPostRequest = {
       title: params.title.trim(),

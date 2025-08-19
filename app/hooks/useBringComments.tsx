@@ -4,7 +4,6 @@ import { useSessionTokenStore } from '../store/useSessionTokenStore';
 import { api } from '../api';
 import { PATH } from '../constants/path';
 
-
 interface Author {
     user_id: number;
     username: string;
@@ -14,15 +13,15 @@ interface Author {
 
 interface Comment {
     content: string;
-    parent_id: number;
+    parent_id: number | null;
     comment_id: number;
     post_id: number;
     author_id: number;
     is_active: boolean;
     created_at: string;
-    updated_at: string;
+    updated_at: string | null;
     author: Author;
-    children: string[];
+    children: Comment[];
 }
 
 interface UseBringCommentsReturn {
@@ -33,14 +32,12 @@ interface UseBringCommentsReturn {
     clearError: () => void;
 }
 
-
-
 const useBringComments = (): UseBringCommentsReturn => {
     const [comments, setComments] = useState<Comment[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [lastFetchedPostId, setLastFetchedPostId] = useState<number | null>(null);
     
-    // Zustand store에서 post 정보와 토큰 가져오기
     const { post } = usePostStore();
     const { token } = useSessionTokenStore();
 
@@ -49,11 +46,13 @@ const useBringComments = (): UseBringCommentsReturn => {
             setError('게시글 ID가 없습니다.');
             return;
         }
-
         if (!token) {
             setError('로그인이 필요합니다.');
             return;
         }
+
+        // 중복 호출 방지
+        if (loading) return;
 
         setLoading(true);
         setError(null);
@@ -65,7 +64,8 @@ const useBringComments = (): UseBringCommentsReturn => {
                 },
             });
 
-            setComments(response.data);
+            setComments(response.data || []);
+            setLastFetchedPostId(post.post_id);
         } catch (err: any) {
             let errorMessage = '댓글을 불러오는데 실패했습니다.';
 
@@ -94,14 +94,15 @@ const useBringComments = (): UseBringCommentsReturn => {
         setError(null);
     };
 
-    // post.id가 변경될 때마다 댓글 불러오기
+    // post.post_id가 변경될 때만 댓글 불러오기 (중복 호출 방지)
     useEffect(() => {
-        if (post?.post_id && token) {
+        if (post?.post_id && token && post.post_id !== lastFetchedPostId) {
             fetchComments();
-        } else {
+        } else if (!post?.post_id || !token) {
             // post나 token이 없으면 댓글도 초기화
             setComments([]);
             setError(null);
+            setLastFetchedPostId(null);
         }
     }, [post?.post_id, token]);
 
