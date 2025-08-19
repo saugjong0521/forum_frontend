@@ -10,7 +10,7 @@ interface Author {
 interface Comment {
     content: string;
     parent_id: number;
-    id: number;
+    comment_id: number;
     post_id: number;
     author_id: number;
     is_active: boolean;
@@ -25,7 +25,7 @@ interface Post {
     content: string;
     board_id: number;
     password: string;
-    id: number;
+    post_id: number;
     author_id: number;
     view_count: number;
     like_count: number;

@@ -72,13 +72,13 @@ const BringCommentBox = ({
     const handleSubmitComment = async () => {
         if (!newComment.trim()) return;
 
-        if (!post?.id) {
+        if (!post?.post_id) {
             alert('게시글 정보를 찾을 수 없습니다.');
             return;
         }
 
         const result = await uploadComment({
-            post_id: post.id,
+            post_id: post.post_id,
             content: newComment
         });
 
@@ -97,13 +97,13 @@ const BringCommentBox = ({
     const handleSubmitReply = async (parentId: number) => {
         if (!replyContent.trim()) return;
 
-        if (!post?.id) {
+        if (!post?.post_id) {
             alert('게시글 정보를 찾을 수 없습니다.');
             return;
         }
 
         const result = await uploadComment({
-            post_id: post.id,
+            post_id: post.post_id,
             content: replyContent,
             parent_id: parentId
         });

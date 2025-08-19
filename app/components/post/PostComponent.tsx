@@ -7,7 +7,7 @@ import BringCommentBox from '../comment/BringCommentBox'; // CommentComponent �
 import { usePostStore } from '@/app/store/usePostStore'; // Post Store 추가
 
 interface Author {
-    id: number;
+    user_id: number;
     username: string;
     nickname: string;
     created_at: string;
@@ -16,7 +16,7 @@ interface Author {
 interface Comment {
     content: string;
     parent_id: number;
-    id: number;
+    comment_id: number;
     post_id: number;
     author_id: number;
     is_active: boolean;
@@ -25,6 +25,8 @@ interface Comment {
     author: Author;
     children: string[];
 }
+
+
 
 const PostComponent = () => {
     const params = useParams();

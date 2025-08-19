@@ -45,7 +45,7 @@ const useBringComments = (): UseBringCommentsReturn => {
     const { token } = useSessionTokenStore();
 
     const fetchComments = async () => {
-        if (!post?.id) {
+        if (!post?.post_id) {
             setError('게시글 ID가 없습니다.');
             return;
         }
@@ -59,7 +59,7 @@ const useBringComments = (): UseBringCommentsReturn => {
         setError(null);
 
         try {
-            const response = await api.get(PATH.GETCOMMENTS(post.id), {
+            const response = await api.get(PATH.GETCOMMENTS(post.post_id), {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -96,14 +96,14 @@ const useBringComments = (): UseBringCommentsReturn => {
 
     // post.id가 변경될 때마다 댓글 불러오기
     useEffect(() => {
-        if (post?.id && token) {
+        if (post?.post_id && token) {
             fetchComments();
         } else {
             // post나 token이 없으면 댓글도 초기화
             setComments([]);
             setError(null);
         }
-    }, [post?.id, token]);
+    }, [post?.post_id, token]);
 
     return {
         comments,

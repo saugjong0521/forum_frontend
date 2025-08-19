@@ -29,7 +29,7 @@ const useBringPost = () => {
         // 캐시된 데이터가 있고 강제 새로고침이 아니며 같은 게시글이고 만료되지 않았다면 return
         if (!forceRefresh && 
             post && 
-            post.id === params.post_id && 
+            post.post_id === params.post_id && 
             !shouldRefetch()) {
             console.log('useBringPost: 캐시된 데이터 사용');
             return post;
@@ -50,7 +50,7 @@ const useBringPost = () => {
                 queryParams,
                 forceRefresh,
                 캐시상태: {
-                    기존_post_id: post?.id,
+                    기존_post_id: post?.post_id,
                     shouldRefetch: shouldRefetch(),
                 }
             });
