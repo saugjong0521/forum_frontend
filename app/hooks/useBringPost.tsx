@@ -7,7 +7,6 @@ import { usePostStore } from '../store/usePostStore';
 interface GetPostParams {
     post_id: number;    // 필수
     password?: number;  // 선택사항
-    forceRefresh?: boolean; // 강제 새로고침
 }
 
 const useBringPost = () => {
@@ -24,15 +23,11 @@ const useBringPost = () => {
     const { token } = useSessionTokenStore();
 
     const bringPost = useCallback(async (params: GetPostParams) => {
-        const { forceRefresh = false } = params;
-        
-        // 캐시된 데이터가 있고 강제 새로고침이 아니며 같은 게시글이고 만료되지 않았다면 return
-        if (!forceRefresh && 
-            post && 
-            post.post_id === params.post_id && 
-            !shouldRefetch()) {
-            console.log('useBringPost: 캐시된 데이터 사용');
-            return post;
+        // 토큰이 없으면 에러 처리
+        if (!token) {
+            setError('게시물을 보기 위해선 로그인이 필요합니다.');
+            setLoading(false);
+            return null;
         }
 
         setLoading(true);
@@ -44,16 +39,6 @@ const useBringPost = () => {
             if (params.password !== undefined) {
                 queryParams.password = params.password;
             }
-
-            console.log('useBringPost API 호출:', {
-                post_id: params.post_id,
-                queryParams,
-                forceRefresh,
-                캐시상태: {
-                    기존_post_id: post?.post_id,
-                    shouldRefetch: shouldRefetch(),
-                }
-            });
 
             const response = await api.get(PATH.GETPOST(params.post_id), {
                 params: queryParams,
@@ -82,12 +67,7 @@ const useBringPost = () => {
         } finally {
             setLoading(false);
         }
-    }, [post, shouldRefetch, setPost, setLoading, setError, token]);
-
-    // 강제 새로고침 함수
-    const refreshPost = useCallback(async (postId: number, password?: number) => {
-        return await bringPost({ post_id: postId, password, forceRefresh: true });
-    }, [bringPost]);
+    }, [setPost, setLoading, setError, token]); // post와 shouldRefetch 제거
 
     // 상태 초기화 함수
     const resetPost = useCallback(() => {
@@ -100,7 +80,6 @@ const useBringPost = () => {
         loading,
         error,
         bringPost,
-        refreshPost,
         resetPost,
     };
 };

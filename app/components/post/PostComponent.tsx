@@ -33,7 +33,7 @@ const PostComponent = () => {
     const router = useRouter();
     const postId = parseInt(params.id as string, 10);
     
-    const { post, loading, error, bringPost, resetPost } = useBringPost();
+    const { post, loading, error, bringPost } = useBringPost();
     const { setPost } = usePostStore(); // Post Store 사용
     const [showPasswordInput, setShowPasswordInput] = useState(false);
     const [password, setPassword] = useState('');
