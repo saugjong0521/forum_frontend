@@ -1,4 +1,4 @@
-import ContentAdmin from "./content/page";
+import AdminSideBar from "../common/AdminSideBar";
 
 
 const AdminPage = () => {
@@ -6,7 +6,7 @@ const AdminPage = () => {
 
     return (
         <div className="flex flex-col items-center justify-center h-full bg-gray-50">
-                <ContentAdmin />
+                <AdminSideBar />
         </div>
     )
 }

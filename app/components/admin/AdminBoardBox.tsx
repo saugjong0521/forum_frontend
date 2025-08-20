@@ -15,11 +15,17 @@ export default function AdminBoardBox() {
     postsPerPage, 
     currentBoardId, 
     sortBy,
-    sortOrder 
+    sortOrder,
+    setPostsPerPage
   } = useBoardPostStore();
   const { user_id } = useUserInfoStore();
   const { post: selectedPost, setPost } = usePostStore();
   const { deactivatePost, loading: deleteLoading, error: deleteError, clearError } = useDeactivatePost();
+
+  // 컴포넌트 마운트 시 20개로 설정
+  useEffect(() => {
+    setPostsPerPage(20);
+  }, [setPostsPerPage]);
 
   useEffect(() => {
     const skip = (currentPage - 1) * postsPerPage;
@@ -160,7 +166,7 @@ export default function AdminBoardBox() {
             </tr>
           ))}
           
-          {/* 빈 행들로 10개까지 채우기 */}
+          {/* 빈 행들로 설정된 개수까지 채우기 */}
           {Array.from({ length: Math.max(0, postsPerPage - posts.length) }, (_, i) => (
             <tr key={`empty-${i}`} className="h-8">
               <td className="px-2 border-b">&nbsp;</td>

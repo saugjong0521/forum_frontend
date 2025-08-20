@@ -1,32 +1,18 @@
 // store/useBoardPostStore.ts
 import { create } from 'zustand';
-import { Board, Post } from '../types/board';
+import { BoardPostsState, Post } from '../types/board';
 
-interface BoardState {
-  // 게시판 설정
-  currentBoardId: number | null;
-  postsPerPage: number;
-  
-  // 페이지네이션
-  currentPage: number;
-  hasNextPage: boolean;
-  
-  // 정렬 설정
-  sortBy: string;
-  sortOrder: string;
-  
-  // 게시글 데이터
-  posts: Post[];
-  loading: boolean;
-  error: string | null;
-  
-  // Actions
+interface BoardPostActions {
+  // 기본 Actions
   setBoardId: (boardId: number | null) => void;
   setCurrentPage: (page: number) => void;
   setHasNextPage: (hasNext: boolean) => void;
   setPosts: (posts: Post[]) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  
+  // 페이지당 게시글 수 설정
+  setPostsPerPage: (postsPerPage: number) => void;
   
   // 정렬 Actions
   setSortBy: (sortBy: string) => void;
@@ -41,7 +27,9 @@ interface BoardState {
   resetBoard: () => void;
 }
 
-export const useBoardPostStore = create<BoardState>((set, get) => ({
+type BoardStore = BoardPostsState & BoardPostActions;
+
+export const useBoardPostStore = create<BoardStore>((set, get) => ({
   // 초기 상태
   currentBoardId: null,
   postsPerPage: 10,
@@ -57,22 +45,35 @@ export const useBoardPostStore = create<BoardState>((set, get) => ({
   error: null,
   
   // Actions
-  setBoardId: (boardId) => set({ 
-    currentBoardId: boardId, 
+  setBoardId: (boardId) => set({
+    currentBoardId: boardId,
     currentPage: 1
   }),
+  
   setCurrentPage: (page) => set({ currentPage: page }),
+  
   setHasNextPage: (hasNext) => set({ hasNextPage: hasNext }),
+  
   setPosts: (posts) => set({ posts }),
+  
   setLoading: (loading) => set({ loading }),
+  
   setError: (error) => set({ error }),
+  
+  // 페이지당 게시글 수 설정 (페이지를 1로 리셋)
+  setPostsPerPage: (postsPerPage) => set({
+    postsPerPage,
+    currentPage: 1
+  }),
   
   // 정렬 Actions
   setSortBy: (sortBy) => set({ sortBy, currentPage: 1 }),
+  
   setSortOrder: (sortOrder) => set({ sortOrder, currentPage: 1 }),
-  setSorting: (sortBy, sortOrder) => set({ 
-    sortBy, 
-    sortOrder, 
+  
+  setSorting: (sortBy, sortOrder) => set({
+    sortBy,
+    sortOrder,
     currentPage: 1
   }),
   

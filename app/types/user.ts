@@ -17,3 +17,4 @@ export interface SignData {
   password: string;
   nickname: string;
 }
+

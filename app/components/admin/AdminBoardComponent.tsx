@@ -125,14 +125,7 @@ export default function AdminBoardComponent() {
             &#x300B;
           </button>
         </div>
-
-        {/* 글쓰기 버튼 */}
-        <Link 
-          href="board/write" 
-          className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          글쓰기
-        </Link>
+        
       </div>
     </div>
   );

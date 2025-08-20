@@ -89,3 +89,22 @@ export interface RecentBoardType {
   limit?: number;       // 게시글 개수 (기본값: 5)
   titleMaxLength?: number; // 제목 최대 길이 (기본값: 15)
 }
+
+export interface BoardPostState {
+  // 게시판 설정
+  currentBoardId: number | null;
+  postsPerPage: number;
+  
+  // 페이지네이션
+  currentPage: number;
+  hasNextPage: boolean;
+  
+  // 정렬 설정
+  sortBy: string;
+  sortOrder: string;
+  
+  // 게시글 데이터
+  posts: Post[];
+  loading: boolean;
+  error: string | null;
+}
