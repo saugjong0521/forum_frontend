@@ -2,6 +2,14 @@
 import { create } from 'zustand';
 import { BoardPostsState, Post } from '../types/board';
 
+// is_active 필터 타입 정의
+type IsActiveFilter = boolean | null; // true(활성), false(비활성), null(전체)
+
+interface AdminBoardPostState extends BoardPostsState {
+  // is_active 필터 추가
+  isActiveFilter: IsActiveFilter;
+}
+
 interface AdminBoardPostActions {
   // 기본 Actions
   setBoardId: (boardId: number | null) => void;
@@ -19,6 +27,9 @@ interface AdminBoardPostActions {
   setSortOrder: (sortOrder: string) => void;
   setSorting: (sortBy: string, sortOrder: string) => void;
   
+  // is_active 필터 Actions
+  setIsActiveFilter: (isActive: IsActiveFilter) => void;
+  
   // 페이지 이동
   goToNextPage: () => void;
   goToPrevPage: () => void;
@@ -27,7 +38,7 @@ interface AdminBoardPostActions {
   resetBoard: () => void;
 }
 
-type AdminBoardStore = BoardPostsState & AdminBoardPostActions;
+type AdminBoardStore = AdminBoardPostState & AdminBoardPostActions;
 
 export const useAdminBoardPostStore = create<AdminBoardStore>((set, get) => ({
   // 초기 상태 - 관리자용은 20개로 설정
@@ -39,6 +50,9 @@ export const useAdminBoardPostStore = create<AdminBoardStore>((set, get) => ({
   // 정렬 기본값
   sortBy: 'created_at',
   sortOrder: 'desc',
+  
+  // is_active 필터 기본값 (null = 전체)
+  isActiveFilter: null,
   
   posts: [],
   loading: false,
@@ -77,6 +91,12 @@ export const useAdminBoardPostStore = create<AdminBoardStore>((set, get) => ({
     currentPage: 1
   }),
   
+  // is_active 필터 Action (페이지를 1로 리셋)
+  setIsActiveFilter: (isActiveFilter) => set({
+    isActiveFilter,
+    currentPage: 1
+  }),
+  
   // 페이지 이동
   goToNextPage: () => {
     const { currentPage, hasNextPage } = get();
@@ -99,5 +119,6 @@ export const useAdminBoardPostStore = create<AdminBoardStore>((set, get) => ({
     posts: [],
     loading: false,
     error: null,
+    // is_active 필터는 초기화하지 않음 (사용자 선택 유지)
   }),
 }));

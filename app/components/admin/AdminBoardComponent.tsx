@@ -19,13 +19,15 @@ export default function AdminBoardComponent() {
     currentBoardId,
     sortBy,
     sortOrder,
+    isActiveFilter, // ✅ 추가
     setCurrentPage,
     goToNextPage,
     goToPrevPage,
     setSorting,
     resetBoard,
     setBoardId,
-    setPostsPerPage
+    setPostsPerPage,
+    setIsActiveFilter // ✅ 추가
   } = useAdminBoardPostStore();
 
   // 게시판 목록 관련 store & hook
@@ -95,6 +97,29 @@ export default function AdminBoardComponent() {
     handleSortChange(newSortBy, newSortOrder);
   };
 
+  // ✅ is_active 필터 변경 핸들러 추가
+  const handleIsActiveFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    let filterValue: boolean | null;
+    
+    if (value === 'all') {
+      filterValue = null;
+    } else if (value === 'active') {
+      filterValue = true;
+    } else {
+      filterValue = false;
+    }
+    
+    console.log('is_active 필터 변경:', { value, filterValue });
+    setIsActiveFilter(filterValue);
+  };
+
+  // ✅ is_active 필터 값을 select value로 변환
+  const getActiveFilterSelectValue = () => {
+    if (isActiveFilter === null) return 'all';
+    return isActiveFilter ? 'active' : 'inactive';
+  };
+
   // 게시판 클릭 핸들러
   const handleBoardThemeClick = (id: number) => {
     console.log('게시판 클릭:', id);
@@ -110,7 +135,7 @@ export default function AdminBoardComponent() {
   return (
     <>
       {/* 게시판 헤더 */}
-      <div className="w-full bg-white p-4 flex justify-between items-center">
+      <div className="w-full bg-white p-2 flex justify-between items-center">
 
         {/* 게시판 네비게이션 */}
         <div className="flex items-center gap-2">
@@ -148,38 +173,48 @@ export default function AdminBoardComponent() {
           )}
         </div>
 
-        <h2 className="text-xl font-bold text-[#000]">관리자 - {getBoardName(currentBoardId)}</h2>
+        <h2 className="text-xl font-bold text-[#000]">{getBoardName(currentBoardId)}</h2>
 
-        {/* 정렬 옵션 */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-[#000]">정렬:</span>
+        {/* ✅ 필터 및 정렬 옵션 */}
+        <div className="flex items-center gap-4">
+          {/* is_active 필터 */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-[#000]">상태:</span>
+            <select
+              value={getActiveFilterSelectValue()}
+              onChange={handleIsActiveFilterChange}
+              className="text-sm border text-[#000] rounded px-2 py-1"
+            >
+              <option value="all">전체</option>
+              <option value="active">활성</option>
+              <option value="inactive">비활성</option>
+            </select>
+          </div>
 
-          <select
-            value={`${sortBy}_${sortOrder}`}
-            onChange={handleSelectChange}
-            className="text-sm border text-[#000] rounded px-2 py-1"
-          >
-            <option value="created_at_desc">작성시간 내림차순</option>
-            <option value="created_at_asc">작성시간 오름차순</option>
-            <option value="view_count_desc">조회수 내림차순</option>
-            <option value="view_count_asc">조회수 오름차순</option>
-            <option value="like_count_desc">추천수 내림차순</option>
-            <option value="like_count_asc">추천수 오름차순</option>
-            <option value="comment_count_desc">댓글수 내림차순</option>
-            <option value="comment_count_asc">댓글수 오름차순</option>
-          </select>
+          {/* 정렬 옵션 */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-[#000]">정렬:</span>
+            <select
+              value={`${sortBy}_${sortOrder}`}
+              onChange={handleSelectChange}
+              className="text-sm border text-[#000] rounded px-2 py-1"
+            >
+              <option value="created_at_desc">작성시간 내림차순</option>
+              <option value="created_at_asc">작성시간 오름차순</option>
+              <option value="view_count_desc">조회수 내림차순</option>
+              <option value="view_count_asc">조회수 오름차순</option>
+              <option value="like_count_desc">추천수 내림차순</option>
+              <option value="like_count_asc">추천수 오름차순</option>
+              <option value="comment_count_desc">댓글수 내림차순</option>
+              <option value="comment_count_asc">댓글수 오름차순</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <AdminBoardBox />
 
       <div className="flex flex-1 bg-white gap-[10px] flex-col">
-        <div className="flex flex-1 bg-white items-center justify-end">
-          <Link href="board/write" className="border bg-blue-400 px-4 py-1 rounded-lg border-blue-500 hover:bg-blue-500 transition-colors">
-            <p className="text-[#fff]">글쓰기</p>
-          </Link>
-        </div>
-
         {/* 페이지네이션 */}
         <div className="flex flex-1 bg-white gap-6 justify-center items-center">
           <button

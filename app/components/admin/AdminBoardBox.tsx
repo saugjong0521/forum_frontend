@@ -14,7 +14,8 @@ export default function AdminBoardBox() {
     postsPerPage, 
     currentBoardId, 
     sortBy,
-    sortOrder
+    sortOrder,
+    isActiveFilter // ✅ 추가됨
   } = useAdminBoardPostStore();
   const { user_id } = useUserInfoStore();
   const { post: selectedPost, setPost } = usePostStore();
@@ -31,7 +32,7 @@ export default function AdminBoardBox() {
     };
     
     bringboard(params);
-  }, [currentPage, currentBoardId, sortBy, sortOrder, bringboard, postsPerPage]);
+  }, [currentPage, currentBoardId, sortBy, sortOrder, isActiveFilter, bringboard, postsPerPage]); // ✅ isActiveFilter 의존성 추가
 
   const handleDelete = async (postId: number, postTitle: string) => {
     const isConfirmed = window.confirm(`"${postTitle}" 게시글을 정말 삭제하시겠습니까?`);
@@ -73,6 +74,35 @@ export default function AdminBoardBox() {
     return user_id && post.author_id === user_id;
   };
 
+  // 게시글 행의 스타일을 결정하는 함수
+  const getRowClassName = (post: any) => {
+    let baseClasses = 'h-8 cursor-pointer transition-colors';
+    
+    // 선택된 게시글 스타일
+    if (selectedPost?.post_id === post.post_id) {
+      baseClasses += ' bg-blue-50';
+    }
+    // 비활성 게시글 스타일 (is_active: false)
+    else if (!post.is_active) {
+      baseClasses += ' bg-gray-100 hover:bg-gray-150';
+    }
+    // 일반 게시글 스타일
+    else {
+      baseClasses += ' hover:bg-gray-50';
+    }
+    
+    return baseClasses;
+  };
+
+  // 텍스트 스타일을 결정하는 함수
+  const getTextClassName = (post: any, baseClass: string) => {
+    if (!post.is_active) {
+      // 비활성 게시글은 텍스트를 더 흐리게
+      return baseClass.replace('text-gray-900', 'text-gray-500').replace('text-gray-600', 'text-gray-400');
+    }
+    return baseClass;
+  };
+
   if (loading) {
     return (
       <div className="flex-1 bg-white border border-gray-300 rounded p-4">
@@ -103,6 +133,7 @@ export default function AdminBoardBox() {
             <th className="px-2 text-left font-medium text-gray-700 border-b w-12">ID</th>
             <th className="px-2 text-left font-medium text-gray-700 border-b">제목</th>
             <th className="px-2 text-center font-medium text-gray-700 border-b w-16">게시판</th>
+            <th className="px-2 text-center font-medium text-gray-700 border-b w-16">상태</th>
             <th className="px-2 text-center font-medium text-gray-700 border-b w-12">조회</th>
             <th className="px-2 text-center font-medium text-gray-700 border-b w-16">작성일</th>
             <th className="px-2 text-center font-medium text-gray-700 border-b w-12">관리</th>
@@ -112,15 +143,13 @@ export default function AdminBoardBox() {
           {posts.map(post => (
             <tr 
               key={post.post_id} 
-              className={`h-8 hover:bg-gray-50 cursor-pointer transition-colors ${
-                selectedPost?.post_id === post.post_id ? 'bg-blue-50' : ''
-              }`}
+              className={getRowClassName(post)}
               onClick={() => setPost(post)}
             >
-              <td className="px-2 text-gray-600 border-b text-center align-middle">
+              <td className={`px-2 border-b text-center align-middle ${getTextClassName(post, 'text-gray-600')}`}>
                 {post.post_id}
               </td>
-              <td className="px-2 text-gray-900 border-b align-middle">
+              <td className={`px-2 border-b align-middle ${getTextClassName(post, 'text-gray-900')}`}>
                 <div className="truncate" title={post.title}>
                   {truncateTitle(post.title)}
                 </div>
@@ -129,6 +158,17 @@ export default function AdminBoardBox() {
                 <div className="truncate max-w-[50px] mx-auto" title={post.board?.name}>
                   {post.board?.name}
                 </div>
+              </td>
+              <td className="px-2 border-b text-center align-middle">
+                {post.is_active ? (
+                  <span className="px-2 py-1 text-xs bg-green-100 text-green-600 rounded">
+                    활성
+                  </span>
+                ) : (
+                  <span className="px-2 py-1 text-xs bg-red-100 text-red-600 rounded">
+                    비활성
+                  </span>
+                )}
               </td>
               <td className="px-2 text-gray-500 border-b text-center align-middle">
                 {post.view_count}
@@ -162,6 +202,7 @@ export default function AdminBoardBox() {
           {/* 빈 행들로 20개까지 채우기 */}
           {Array.from({ length: Math.max(0, postsPerPage - posts.length) }, (_, i) => (
             <tr key={`empty-${i}`} className="h-8">
+              <td className="px-2 border-b">&nbsp;</td>
               <td className="px-2 border-b">&nbsp;</td>
               <td className="px-2 border-b">&nbsp;</td>
               <td className="px-2 border-b">&nbsp;</td>

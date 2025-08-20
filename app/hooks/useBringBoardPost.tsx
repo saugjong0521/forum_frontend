@@ -23,24 +23,32 @@ export const useBringBoardPost = () => {
     setLoading(true);
     setError(null);
 
-    const queryParams = {
+    const queryParams: GetBoardParams = {
       skip: params.skip || 0,
       limit: params.limit || postsPerPage,
       board_id: params.board_id || currentBoardId,
-      sort_by: params.sort_by || sortBy,          // store에서 가져온 값 사용
-      sort_order: params.sort_order || sortOrder  // store에서 가져온 값 사용
+      sort_by: params.sort_by || sortBy,
+      sort_order: params.sort_order || sortOrder,
+      // 일반 사용자용은 항상 활성 게시글만 조회
+      is_active: true
     };
 
     try {
+      console.log('🔍 일반 사용자 API 요청 파라미터:', queryParams);
+
       const response = await api.get(PATH.GETBOARD, {
         params: queryParams,
       });
 
       const fetchedPosts = response.data;
-      setPosts(fetchedPosts);
+      
+      // 추가 보안: 클라이언트에서도 is_active: true인 게시글만 필터링
+      const activePosts = fetchedPosts.filter((post: any) => post.is_active === true);
+      
+      setPosts(activePosts);
 
       // 다음 페이지가 있는지 확인
-      const requestedLimit = queryParams.limit;
+      const requestedLimit = queryParams.limit || postsPerPage;
       const hasMore = fetchedPosts.length === requestedLimit;
 
       if (hasMore) {
@@ -60,7 +68,13 @@ export const useBringBoardPost = () => {
         setHasNextPage(false);
       }
 
-      return fetchedPosts;
+      console.log('✅ 일반 사용자 게시글 조회 완료:', {
+        전체응답: fetchedPosts.length,
+        활성게시글: activePosts.length,
+        다음페이지: hasMore
+      });
+
+      return activePosts;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '게시글을 가져오는데 실패했습니다.';
       setError(errorMessage);

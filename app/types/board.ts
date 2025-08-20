@@ -35,20 +35,21 @@ export interface Comment {
 
 // 게시글 정보 (API 응답과 일치, board 필드 추가)
 export interface Post {
+    post_id: number;        // 첫 번째로 이동
     title: string;
-    content: string;
     board_id: number;
-    password?: string; // optional로 변경 (보안상 응답에 없을 수 있음)
-    post_id: number;
     author_id: number;
     view_count: number;
     like_count: number;
     is_active: boolean;
     created_at: string;
     updated_at: string | null;
-    author: Author;
-    board: Board; // API 응답에 포함됨
-    comments?: Comment[]; // optional (항상 포함되지 않을 수 있음)
+    author: Author;         // 필수 (API 응답에 포함)
+    board: Board;           // 필수 (API 응답에 포함)
+    
+    content?: string;       // optional (목록 조회시 없음)
+    password?: string;      // optional (보안상 없음)
+    comments?: Comment[];   // optional (상세 조회시만)
 }
 
 export interface UploadPostType {
@@ -72,6 +73,7 @@ export interface DeactivePostType {
 export interface GetBoardParams {
   skip?: number;
   limit?: number;
+  is_active?: boolean | null;
   board_id?: number | null;
   sort_by?: string;
   sort_order?: string;
