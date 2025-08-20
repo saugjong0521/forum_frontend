@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import AdminBoardComponent from "@/app/components/admin/AdminBoardComponent";
 import AdminBoardDisplay from "@/app/components/admin/AdminBoardDisplay";
 
@@ -20,53 +20,69 @@ const ContentAdmin = () => {
     return (
         <div className="flex flex-col items-center justify-center h-full bg-gray-50">
             <div className="w-full h-full flex gap-4 p-4">
+                <Suspense fallback={
+                    <div className="w-full h-full flex gap-4">
+                        <div className="w-1/2 h-full flex flex-col">
+                            <div className="flex gap-[15px] mb-2">
+                                <div className="px-4 py-2 bg-gray-200 rounded">게시글</div>
+                                <div className="px-4 py-2 bg-gray-200 rounded">댓글</div>
+                            </div>
+                            <div className="flex-1 bg-white border border-gray-300 rounded p-4">
+                                <div className="text-center text-gray-500">로딩 중...</div>
+                            </div>
+                        </div>
+                        <div className="w-1/2 h-full bg-white border border-gray-300 rounded p-4">
+                            <div className="text-center text-gray-500">로딩 중...</div>
+                        </div>
+                    </div>
+                }>
+                    {/* 좌측 영역 */}
+                    <div className="w-1/2 h-full flex flex-col">
+                        {/* 탭 버튼들 */}
+                        <div className="flex gap-[15px] mb-2">
+                            <button 
+                                className={`px-4 py-2 rounded transition-colors ${
+                                    activeTab === 'board' 
+                                        ? 'bg-blue-500 text-white' 
+                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                }`}
+                                onClick={handleDisplayBoard}
+                            >
+                                <p>게시글</p>
+                            </button>
+                            <button 
+                                className={`px-4 py-2 rounded transition-colors ${
+                                    activeTab === 'comment' 
+                                        ? 'bg-blue-500 text-white' 
+                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                }`}
+                                onClick={handleDisplayComment}
+                            >
+                                <p>댓글</p>
+                            </button>
+                        </div>
 
-                {/* 좌측 영역 */}
-                <div className="w-1/2 h-full flex flex-col">
-                    {/* 탭 버튼들 */}
-                    <div className="flex gap-[15px] mb-2">
-                        <button 
-                            className={`px-4  rounded transition-colors ${
-                                activeTab === 'board' 
-                                    ? 'bg-blue-500 text-white' 
-                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                            }`}
-                            onClick={handleDisplayBoard}
-                        >
-                            <p>게시글</p>
-                        </button>
-                        <button 
-                            className={`px-4 rounded transition-colors ${
-                                activeTab === 'comment' 
-                                    ? 'bg-blue-500 text-white' 
-                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                            }`}
-                            onClick={handleDisplayComment}
-                        >
-                            <p>댓글</p>
-                        </button>
+                        {/* 좌측 컨텐츠 */}
+                        {activeTab === 'board' ? (
+                            <AdminBoardComponent />
+                        ) : (
+                            <div className="flex-1 bg-white border border-gray-300 rounded p-4">
+                                <div className="text-center text-gray-500">댓글 관리 영역 (준비중)</div>
+                            </div>
+                        )}
                     </div>
 
-                    {/* 좌측 컨텐츠 */}
-                    {activeTab === 'board' ? (
-                        <AdminBoardComponent />
-                    ) : (
-                        <div className="flex-1 bg-white border border-gray-300 rounded p-4">
-                            <div className="text-center text-gray-500">댓글 관리 영역 (준비중)</div>
-                        </div>
-                    )}
-                </div>
-
-                {/* 우측 영역 */}
-                <div className="w-1/2 h-full">
-                    {activeTab === 'board' ? (
-                        <AdminBoardDisplay />
-                    ) : (
-                        <div className="h-full bg-white border border-gray-300 rounded p-4">
-                            <div className="text-center text-gray-500">댓글 상세 영역 (준비중)</div>
-                        </div>
-                    )}
-                </div>
+                    {/* 우측 영역 */}
+                    <div className="w-1/2 h-full">
+                        {activeTab === 'board' ? (
+                            <AdminBoardDisplay />
+                        ) : (
+                            <div className="h-full bg-white border border-gray-300 rounded p-4">
+                                <div className="text-center text-gray-500">댓글 상세 영역 (준비중)</div>
+                            </div>
+                        )}
+                    </div>
+                </Suspense>
             </div>
         </div>
     );
