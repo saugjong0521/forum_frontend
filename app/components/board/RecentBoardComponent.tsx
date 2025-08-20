@@ -2,21 +2,15 @@
 
 import { useEffect } from 'react';
 import Link from "next/link";
-import { useBringRecentBoard } from '../../hooks/useBringRecentBoard'; // 새로운 훅 사용
-
-interface RecentBoardComponentProps {
-  showHeader?: boolean; // 테이블 헤더 표시 여부 (기본값: true)
-  showTitle?: boolean;  // 컴포넌트 제목 표시 여부 (기본값: true)
-  limit?: number;       // 게시글 개수 (기본값: 5)
-  titleMaxLength?: number; // 제목 최대 길이 (기본값: 15)
-}
+import { useBringRecentBoard } from '../../hooks/useBringRecentBoard';
+import { RecentBoardType } from '../../types/board'; // 추가
 
 export default function RecentBoardComponent({
   showHeader = true,
   showTitle = true,
   limit = 5,
   titleMaxLength = 15
-}: RecentBoardComponentProps) {
+}: RecentBoardType) { // 타입 변경
   const { posts, bringSideBoard, loading, error } = useBringRecentBoard();
 
   // 컴포넌트 마운트 시 전체 게시글 가져오기
@@ -35,20 +29,26 @@ export default function RecentBoardComponent({
     return title.length > maxLength ? title.substring(0, maxLength) + '...' : title;
   };
 
+  // 게시판 이름 말줄임표 함수 추가
+  const truncateBoardName = (name: string, maxLength: number = 5) => {
+    return name.length > maxLength ? name.substring(0, maxLength) + '...' : name;
+  };
+
   // 컴팩트한 행 렌더링
   const renderCompactRows = () => {
     const rows = [];
-    
+
     // 실제 게시글 행들만 렌더링 (빈 행 없음)
     for (let i = 0; i < posts.length; i++) {
       const post = posts[i];
+
       rows.push(
         <tr key={post.post_id} className="hover:bg-gray-50 h-[35px]">
           <td className="px-2 text-xs text-gray-600 border-b border-gray-300 text-center w-12 align-middle">
             {post.post_id}
           </td>
           <td className="px-2 text-xs text-gray-900 border-b border-gray-300 align-middle">
-            <Link 
+            <Link
               href={`/board/${post.post_id}`}
               className="text-blue-600 hover:text-blue-800 hover:underline block"
               title={post.title}
@@ -56,13 +56,15 @@ export default function RecentBoardComponent({
               {truncateTitle(post.title)}
             </Link>
           </td>
-          <td className="px-2 text-xs text-gray-500 border-b border-gray-300 text-center w-12 align-middle">
-            {post.board_id}
+          <td className="px-2 text-xs text-gray-500 border-b border-gray-300 text-center w-20 align-middle">
+            <div className="truncate max-w-[50px] mx-auto" title={post.board?.name}>
+              {truncateBoardName(post.board?.name || '')}
+            </div>
           </td>
         </tr>
       );
     }
-    
+
     return rows;
   };
 
@@ -76,7 +78,7 @@ export default function RecentBoardComponent({
               최신 게시글
             </h3>
             <span className="text-xs text-gray-500">
-              All Boards
+              최근 {limit}개
             </span>
           </div>
         </div>
@@ -104,7 +106,7 @@ export default function RecentBoardComponent({
                 <tr className="h-[35px]">
                   <th className="px-2 text-left text-xs font-medium text-gray-600 border-b w-12">번호</th>
                   <th className="px-2 text-left text-xs font-medium text-gray-600 border-b">제목</th>
-                  <th className="px-2 text-center text-xs font-medium text-gray-600 border-b w-12">ID</th>
+                  <th className="px-2 text-center text-xs font-medium text-gray-600 border-b w-20">게시판</th>
                 </tr>
               </thead>
             )}

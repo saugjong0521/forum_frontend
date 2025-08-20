@@ -2,14 +2,7 @@ import { useCallback } from 'react';
 import { PATH } from '../constants/path';
 import { api } from '../api';
 import { useBoardPostStore } from '../store/useBoardPostStore';
-
-interface GetBoardParams {
-  skip?: number;
-  limit?: number;
-  board_id?: number;
-  sort_by?: string;
-  sort_order?: string;
-}
+import { GetBoardParams } from '../types/board';
 
 export const useBringBoardPost = () => {
   const {
@@ -49,7 +42,7 @@ export const useBringBoardPost = () => {
       // 다음 페이지가 있는지 확인
       const requestedLimit = queryParams.limit;
       const hasMore = fetchedPosts.length === requestedLimit;
-      
+
       if (hasMore) {
         try {
           const nextPageResponse = await api.get(PATH.GETBOARD, {

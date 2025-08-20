@@ -1,14 +1,6 @@
 import { create } from 'zustand';
+import { Board } from '../types/board';
 
-interface Board {
-  slug: string;
-  name: string;
-  description: string;
-  board_id: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string | null;
-}
 
 interface BoardsNameState {
   // 게시판 목록 데이터

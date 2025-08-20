@@ -2,43 +2,8 @@
 import { useState, useEffect } from 'react';
 import useHandleRecommend from '@/app/hooks/useHandleRecommend';
 import { usePostStore } from '@/app/store/usePostStore';
+import { Post } from '@/app/types/board';
 
-// 공통 타입 정의 (다른 컴포넌트들과 일치하도록)
-interface Author {
-    user_id: number;
-    username: string;
-    nickname: string;
-    created_at: string;
-}
-
-interface Comment {
-    content: string;
-    parent_id: number | null;
-    comment_id: number;
-    post_id: number;
-    author_id: number;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string | null;
-    author: Author;
-    children: Comment[];
-}
-
-interface Post {
-    title: string;
-    content: string;
-    board_id: number;
-    password?: string;
-    post_id: number;
-    author_id: number;
-    view_count: number;
-    like_count: number;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string | null;
-    author: Author;
-    comments?: Comment[];
-}
 
 interface BringPostBoxProps {
     post: Post;
@@ -59,7 +24,7 @@ const formatDate = (dateString: string) => {
 const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
     const [currentLikeCount, setCurrentLikeCount] = useState(post.like_count);
     const [isRecommended, setIsRecommended] = useState(false);
-    
+
     const { recommendPost, undoRecommend, loading, error, clearError } = useHandleRecommend();
 
     // 게시글이 변경되면 추천 수 동기화
@@ -75,13 +40,13 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
         }
 
         const success = await recommendPost(post.post_id);
-        
+
         if (success) {
             const newLikeCount = currentLikeCount + 1;
             setCurrentLikeCount(newLikeCount);
             setIsRecommended(true);
             clearError();
-            
+
             // 부모 컴포넌트에 업데이트 알림
             if (onPostUpdate) {
                 onPostUpdate({
@@ -100,13 +65,13 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
         }
 
         const success = await undoRecommend(post.post_id);
-        
+
         if (success) {
             const newLikeCount = currentLikeCount - 1;
             setCurrentLikeCount(newLikeCount);
             setIsRecommended(false);
             clearError();
-            
+
             // 부모 컴포넌트에 업데이트 알림
             if (onPostUpdate) {
                 onPostUpdate({
@@ -135,7 +100,7 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
                     {post.title}
                 </h1>
-                
+
                 <div className="flex items-center justify-between text-sm text-gray-600">
                     <div className="flex items-center gap-4">
                         <span className="font-medium">
@@ -143,7 +108,7 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
                         </span>
                         <span>{formatDate(post.created_at)}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-4">
                         <span>조회수 {post.view_count || 0}</span>
                         <span>추천 {currentLikeCount}</span>
@@ -153,7 +118,7 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
 
             {/* 게시글 내용 */}
             <div className="prose max-w-none mb-6">
-                <div 
+                <div
                     className="text-gray-800 leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: post.content || '' }}
                 />
@@ -185,7 +150,7 @@ const BringPostBox = ({ post, onPostUpdate }: BringPostBoxProps) => {
                             {loading ? '해제 중...' : '추천 해제'}
                         </button>
                     )}
-                    
+
                     <div className="text-sm text-gray-500">
                         추천 {currentLikeCount}
                     </div>

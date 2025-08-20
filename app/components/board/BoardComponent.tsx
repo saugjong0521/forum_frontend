@@ -7,7 +7,6 @@ import BringBoardBox from './BringBoardBox';
 import { useBoardPostStore } from '../../store/useBoardPostStore'; // 게시글 관련
 import { useBoardsStore } from '../../store/useBoardsStore'; // 게시판 목록 관련
 import { useBringBoards } from '@/app/hooks/useBringBoards';
-import { useUserInfoStore } from '@/app/store/useUserInfoStore';
 
 export default function BoardComponent() {
   const router = useRouter();

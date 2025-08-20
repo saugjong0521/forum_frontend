@@ -1,37 +1,11 @@
+// hooks/useUploadPost.ts
 'use client';
 
 import { useState } from 'react';
 import { useSessionTokenStore } from '../store/useSessionTokenStore';
 import { PATH } from '../constants/path';
 import { api } from '../api';
-
-interface UploadPostParams {
-  title: string;
-  content: string;
-  password: string; // string으로 받아서 처리
-  board_id?: number;
-}
-
-interface UploadPostRequest {
-  title: string;
-  content: string;
-  board_id: number;
-  password: string | null; // string으로 변경
-}
-
-interface UploadPostResponse {
-  post_id: number;
-  author_id: number;
-  board_id: number;
-  title: string;
-  content: string;
-  view_count: number;
-  like_count: number;
-  is_active: boolean;
-  password: string | null; // string으로 변경
-  created_at: string;
-  updated_at: string;
-}
+import { Post, UploadPostType } from '../types/board';
 
 export const useUploadPost = () => {
   const [loading, setLoading] = useState(false);
@@ -57,7 +31,7 @@ export const useUploadPost = () => {
     return { isValid: true };
   };
 
-  const uploadPost = async (params: UploadPostParams): Promise<UploadPostResponse | null> => {
+  const uploadPost = async (params: UploadPostType): Promise<Post | null> => {
     setLoading(true);
     setError(null);
 
@@ -74,7 +48,7 @@ export const useUploadPost = () => {
       ? null 
       : params.password.trim();
 
-    const postData: UploadPostRequest = {
+    const postData = {
       title: params.title.trim(),
       content: params.content,
       board_id: params.board_id || 2,
@@ -88,7 +62,7 @@ export const useUploadPost = () => {
         },
       });
 
-      return response.data;
+      return response.data; // Post 타입으로 반환
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '게시글 작성에 실패했습니다.';
       setError(errorMessage);

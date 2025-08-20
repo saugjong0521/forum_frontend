@@ -1,19 +1,13 @@
-import { useState, useEffect } from 'react';
+// hooks/useCheckRecommend.ts
+import { useState } from 'react';
 import { api } from '../api';
 import { PATH } from '../constants/path';
 import { useSessionTokenStore } from '../store/useSessionTokenStore';
 import { useRecommendStore } from '../store/useRecommendStore';
-
-interface RecommendResponse {
-    post_id: number;
-    user_id: number;
-    is_recommended: boolean;
-    recommendation_id?: number;
-    created_at?: string;
-}
+import { RecommendState } from '../types/recommend'; // 변경
 
 interface UseCheckRecommendReturn {
-    checkRecommend: (postId: number) => Promise<RecommendResponse | null>;
+    checkRecommend: (postId: number) => Promise<RecommendState | null>;
     loading: boolean;
     error: string | null;
     clearError: () => void;
@@ -25,7 +19,7 @@ const useCheckRecommend = (): UseCheckRecommendReturn => {
     const { token } = useSessionTokenStore();
     const { setRecommendState } = useRecommendStore();
 
-    const checkRecommend = async (postId: number): Promise<RecommendResponse | null> => {
+    const checkRecommend = async (postId: number): Promise<RecommendState | null> => {
         if (!token) {
             setError('로그인이 필요합니다.');
             return null;
@@ -41,7 +35,7 @@ const useCheckRecommend = (): UseCheckRecommendReturn => {
                 },
             });
 
-            const recommendData: RecommendResponse = response.data;
+            const recommendData: RecommendState = response.data;
             
             // 스토어에 상태 저장
             setRecommendState(postId, recommendData);

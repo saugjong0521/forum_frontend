@@ -1,23 +1,9 @@
+// hooks/useBringBoards.ts
 import { useCallback } from 'react';
 import { PATH } from '../constants/path';
 import { api } from '../api';
 import { useBoardsStore } from '../store/useBoardsStore';
-
-interface Board {
-  slug: string;
-  name: string;
-  description: string;
-  board_id: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string | null;
-}
-
-interface GetBoardsParams {
-  skip?: number;
-  limit?: number;
-  forceRefresh?: boolean; // 강제 새로고침 옵션
-}
+import { Board, GetBoardParams } from '../types/board';
 
 export const useBringBoards = () => {
   const {
@@ -29,7 +15,7 @@ export const useBringBoards = () => {
     setError,
   } = useBoardsStore();
 
-  const bringBoardsName = useCallback(async (params: GetBoardsParams = {}) => {
+  const bringBoardsName = useCallback(async (params: GetBoardParams = {}) => {
 
     setLoading(true);
     setError(null);
@@ -45,7 +31,7 @@ export const useBringBoards = () => {
       });
 
       const fetchedBoards: Board[] = response.data;
-      setBoards(fetchedBoards); // useBoardsNameStore에 저장
+      setBoards(fetchedBoards);
       return fetchedBoards;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '게시판 목록을 가져오는데 실패했습니다.';
@@ -59,7 +45,7 @@ export const useBringBoards = () => {
 
   // 강제 새로고침 함수
   const refreshBoards = useCallback(async () => {
-    return await bringBoardsName({ forceRefresh: true });
+    return await bringBoardsName({});
   }, [bringBoardsName]);
 
   return {

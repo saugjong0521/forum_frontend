@@ -1,40 +1,6 @@
+// store/usePostStore.ts
 import { create } from 'zustand';
-
-interface Author {
-    user_id: number;
-    username: string;
-    nickname: string;
-    created_at: string;
-}
-
-interface Comment {
-    content: string;
-    parent_id: number | null;
-    comment_id: number;
-    post_id: number;
-    author_id: number;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string | null;
-    author: Author;
-    children: Comment[]; // 트리 구조를 위한 Comment 배열
-}
-
-interface Post {
-    title: string;
-    content: string;
-    board_id: number;
-    password: string;
-    post_id: number;
-    author_id: number;
-    view_count: number;
-    like_count: number;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
-    author: Author;
-    comments: Comment[];
-}
+import { Post } from '../types/board';
 
 interface PostState {
     // 게시글 데이터
@@ -79,13 +45,12 @@ export const usePostStore = create<PostState>((set, get) => ({
         return post && userId ? post.author_id === userId : false;
     },
     
-    shouldRefetch: (maxAgeMinutes = 10) => { // 게시글은 10분 캐시
+    shouldRefetch: (maxAgeMinutes = 10) => {
         const { lastFetched } = get();
         if (!lastFetched) return true;
         
-        // 개발 환경에서는 캐시 시간을 더 짧게
         const isDev = process.env.NODE_ENV === 'development';
-        const effectiveMaxAge = isDev ? 1 : maxAgeMinutes; // 개발: 1분, 운영: 10분
+        const effectiveMaxAge = isDev ? 1 : maxAgeMinutes;
         
         const maxAge = effectiveMaxAge * 60 * 1000;
         const age = Date.now() - lastFetched;

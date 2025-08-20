@@ -28,7 +28,6 @@ export default function BringBoardBox() {
       sortOrder,
       postsPerPage
     });
-    console.log('현재 posts:', posts);
 
     const skip = (currentPage - 1) * postsPerPage;
     const params = { 

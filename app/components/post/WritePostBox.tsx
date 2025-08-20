@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useUploadPost } from '../../hooks/useUploadPost';
 import { useUserInfoStore } from '../../store/useUserInfoStore';
 import { useBoardPostStore } from '../../store/useBoardPostStore';
-import { SlateTextEditorRef } from './SlateTextEditor';
+import { SlateTextEditorRef } from '@/app/types/editor';
 
 export default function WritePostBox() {
     const router = useRouter();

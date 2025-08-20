@@ -2,17 +2,16 @@ import { useState, useCallback } from 'react';
 import { PATH } from '../constants/path';
 import { api } from '../api';
 import { useSessionTokenStore } from '../store/useSessionTokenStore';
+import { DeactivePostType } from '../types/board';
 
-interface DeactivePostParams {
-  post_id: number;
-}
+
 
 const useDeactivatePost = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { token } = useSessionTokenStore();
 
-  const deactivatePost = useCallback(async (params: DeactivePostParams) => {
+  const deactivatePost = useCallback(async (params: DeactivePostType) => {
     setLoading(true);
     setError(null);
 

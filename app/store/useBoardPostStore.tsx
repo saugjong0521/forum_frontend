@@ -1,21 +1,10 @@
+// store/useBoardPostStore.ts
 import { create } from 'zustand';
-
-interface Post {
-  post_id: number;
-  author_id: number;
-  currentBoardId: number | null;
-  title: string;
-  view_count: number;
-  like_count: number;
-  is_active: boolean;
-  password: string;
-  created_at: string;
-  updated_at: string;
-}
+import { Board, Post } from '../types/board';
 
 interface BoardState {
   // 게시판 설정
-  currentBoardId: number | null; // integer지만 optional이므로 null 허용
+  currentBoardId: number | null;
   postsPerPage: number;
   
   // 페이지네이션
@@ -32,7 +21,7 @@ interface BoardState {
   error: string | null;
   
   // Actions
-  setBoardId: (boardId: number | null) => void; // number 또는 null
+  setBoardId: (boardId: number | null) => void;
   setCurrentPage: (page: number) => void;
   setHasNextPage: (hasNext: boolean) => void;
   setPosts: (posts: Post[]) => void;
@@ -54,7 +43,7 @@ interface BoardState {
 
 export const useBoardPostStore = create<BoardState>((set, get) => ({
   // 초기 상태
-  currentBoardId: null, // null로 기본값 설정 (board_id 없음)
+  currentBoardId: null,
   postsPerPage: 10,
   currentPage: 1,
   hasNextPage: false,
@@ -70,7 +59,7 @@ export const useBoardPostStore = create<BoardState>((set, get) => ({
   // Actions
   setBoardId: (boardId) => set({ 
     currentBoardId: boardId, 
-    currentPage: 1 // board 변경시 페이지 초기화
+    currentPage: 1
   }),
   setCurrentPage: (page) => set({ currentPage: page }),
   setHasNextPage: (hasNext) => set({ hasNextPage: hasNext }),
@@ -79,12 +68,12 @@ export const useBoardPostStore = create<BoardState>((set, get) => ({
   setError: (error) => set({ error }),
   
   // 정렬 Actions
-  setSortBy: (sortBy) => set({ sortBy, currentPage: 1 }), // 정렬 변경시 페이지 초기화
+  setSortBy: (sortBy) => set({ sortBy, currentPage: 1 }),
   setSortOrder: (sortOrder) => set({ sortOrder, currentPage: 1 }),
   setSorting: (sortBy, sortOrder) => set({ 
     sortBy, 
     sortOrder, 
-    currentPage: 1 // 정렬 변경시 페이지 초기화
+    currentPage: 1
   }),
   
   // 페이지 이동
@@ -109,6 +98,5 @@ export const useBoardPostStore = create<BoardState>((set, get) => ({
     posts: [],
     loading: false,
     error: null,
-    // 정렬은 초기화하지 않음 (사용자 설정 유지)
   }),
 }));

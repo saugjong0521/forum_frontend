@@ -2,7 +2,8 @@
 
 import React, { useEffect } from 'react';
 import BringCommentBox from './BringCommentBox';
-import { useCommentStore, Comment } from '@/app/store/useCommentStore';
+import { useCommentStore } from '@/app/store/useCommentStore';
+import { Comment } from '@/app/types/board';
 
 interface CommentComponentProps {
     onCommentsUpdate?: (comments: Comment[]) => void; // 댓글 업데이트 시 부모에게 알림

@@ -1,40 +1,17 @@
+// hooks/useUploadComment.ts
 import { useState } from 'react';
 import { PATH } from '../constants/path';
 import { api } from '../api';
 import { useSessionTokenStore } from '../store/useSessionTokenStore';
-import { Comment, Author } from '@/app/store/useCommentStore'; // 공통 타입 import
+import { Comment, UploadCommentType } from '../types/board';
 
-interface UploadCommentParams {
-  post_id: number;
-  content: string;
-  parent_id?: number; // 대댓글의 경우 부모 댓글 ID
-}
-
-interface UploadCommentRequest {
-  content: string;
-  parent_id: number;
-}
-
-// Comment와 Author는 useCommentStore에서 import해서 사용
-interface UploadCommentResponse {
-  content: string;
-  parent_id: number | null;
-  comment_id: number;
-  post_id: number;
-  author_id: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string | null;
-  author: Author;
-  children: Comment[]; // useCommentStore의 Comment 타입 사용
-}
 
 const useUploadComment = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { token } = useSessionTokenStore();
 
-  const uploadComment = async (params: UploadCommentParams): Promise<UploadCommentResponse | null> => {
+  const uploadComment = async (params: UploadCommentType): Promise<Comment | null> => {
     setLoading(true);
     setError(null);
 
@@ -52,7 +29,7 @@ const useUploadComment = () => {
     }
 
     try {
-      const commentData: UploadCommentRequest = {
+      const commentData = {
         content: params.content.trim(),
         parent_id: params.parent_id || 0, // 일반 댓글은 0, 대댓글은 부모 댓글 ID
       };
@@ -63,7 +40,7 @@ const useUploadComment = () => {
         },
       });
 
-      return response.data;
+      return response.data; // Comment 타입으로 반환
     } catch (err: any) {
       let errorMessage = '댓글 작성에 실패했습니다.';
 
@@ -85,7 +62,6 @@ const useUploadComment = () => {
     }
   };
 
-  // 에러 초기화 함수
   const clearError = () => {
     setError(null);
   };

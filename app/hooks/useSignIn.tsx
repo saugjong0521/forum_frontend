@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from "react"
-import { SignData } from "../types/sign"
 import { api } from "../api";
 import { PATH } from "../constants/path";
 import { useSessionTokenStore } from "../store/useSessionTokenStore";
 import { useUserInfoStore } from "../store/useUserInfoStore";
+import { SignData } from "../types/user";
 
 const useSignIn = () => {
     const [formData, setFormData] = useState<SignData>({

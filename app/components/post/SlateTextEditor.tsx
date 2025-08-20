@@ -1,43 +1,12 @@
 'use client'
 
 import React, { useCallback, useMemo, useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react'
-import { createEditor, Descendant, Editor, Element as SlateElement, Transforms, Text, BaseEditor, Path, Node } from 'slate'
+import { createEditor, Descendant, Editor, Element as SlateElement, Transforms, Text, Path, Node } from 'slate'
 import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, ReactEditor, useSlate } from 'slate-react'
 import { withHistory } from 'slate-history'
+import { CustomElement, CustomText, SlateTextEditorRef } from '../../types/editor'
 
-// 타입 정의
-type CustomElement = {
-    type: 'paragraph' | 'heading-1' | 'heading-2' | 'heading-3' | 'bulleted-list' | 'numbered-list' | 'list-item' | 'blockquote' | 'code-block'
-    children: CustomText[]
-    level?: number
-    listType?: 'bulleted' | 'numbered'
-}
-
-type CustomText = {
-    text: string
-    bold?: boolean
-    italic?: boolean
-    underline?: boolean
-    code?: boolean
-    fontSize?: number
-    color?: string
-}
-
-// ✅ 부모 컴포넌트에서 HTML을 가져올 수 있는 ref 타입
-export interface SlateTextEditorRef {
-    getHTML: () => string;
-    clear: () => void;
-}
-
-declare module 'slate' {
-    interface CustomTypes {
-        Editor: BaseEditor & ReactEditor
-        Element: CustomElement
-        Text: CustomText
-    }
-}
-
-// 기존 함수들 (동일하므로 생략하고 핵심만)
+// 기존 함수들
 const isBlockActive = (editor: Editor, format: string, blockType = 'type') => {
     const { selection } = editor
     if (!selection) return false
@@ -62,7 +31,7 @@ const isBlockActive = (editor: Editor, format: string, blockType = 'type') => {
 const isMarkActive = (editor: Editor, format: keyof Omit<CustomText, 'text'>) => {
     try {
         const marks = Editor.marks(editor)
-        return marks ? marks[format] === true : false
+        return marks ? (marks as any)[format] === true : false
     } catch (error) {
         console.warn('Error checking mark active state:', error)
         return false
@@ -222,13 +191,13 @@ const toggleMark = (editor: Editor, format: keyof Omit<CustomText, 'text'>) => {
     const isActive = isMarkActive(editor, format)
 
     if (isActive) {
-        Editor.removeMark(editor, format)
+        Editor.removeMark(editor, format as string) // 타입 단언 추가
     } else {
-        Editor.addMark(editor, format, true)
+        Editor.addMark(editor, format as string, true) // 타입 단언 추가
     }
 }
 
-// 렌더링 컴포넌트들 (기존과 동일)
+// 렌더링 컴포넌트들
 const Element = React.memo(({ attributes, children, element }: RenderElementProps) => {
     const style = { textAlign: (element as any).align }
 
@@ -466,7 +435,7 @@ const ToolbarButton = React.memo<{
     )
 })
 
-// ✅ forwardRef로 ref 지원하는 메인 에디터 컴포넌트
+// 메인 에디터 컴포넌트
 const SlateTextEditor = forwardRef<SlateTextEditorRef>((props, ref) => {
     const editor = useMemo(() => withHistory(withReact(createEditor())), [])
     const composingRef = useRef(false)
@@ -482,7 +451,6 @@ const SlateTextEditor = forwardRef<SlateTextEditorRef>((props, ref) => {
     const [fontSize, setFontSize] = useState<number>(16)
     const [textColor, setTextColor] = useState<string>('#000000')
 
-    // ✅ 부모 컴포넌트에서 HTML과 clear 함수에 접근할 수 있게 함
     useImperativeHandle(ref, () => ({
         getHTML: () => html,
         clear: () => {

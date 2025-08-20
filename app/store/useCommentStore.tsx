@@ -1,25 +1,6 @@
+// store/useCommentStore.ts
 import { create } from 'zustand';
-
-// /types/comment.ts
-export interface Author {
-    user_id: number;
-    username: string;
-    nickname: string;
-    created_at: string;
-}
-
-export interface Comment {
-    content: string;
-    parent_id: number | null;
-    comment_id: number;
-    post_id: number;
-    author_id: number;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string | null;
-    author: Author;
-    children: Comment[]; // 트리 구조를 위한 Comment 배열
-}
+import { Comment } from '../types/board';
 
 interface CommentState {
     // 댓글 데이터

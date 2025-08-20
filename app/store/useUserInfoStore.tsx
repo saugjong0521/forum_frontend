@@ -1,24 +1,38 @@
+// store/useUserInfoStore.ts
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { UserState } from '../types/user';
 
-interface UserInfoState {
-  username: string;
-  email: string;
-  nickname: string;
-  user_id: number;
-  setUserInfo: (userInfo: Partial<Omit<UserInfoState, 'setUserInfo'>>) => void;
+interface UserInfoState extends UserState {
+  setUserInfo: (userInfo: Partial<UserState>) => void;
   clearUserInfo: () => void;
 }
 
 const useUserInfoStore = create<UserInfoState>()(
   persist(
     (set) => ({
+      // User 필드들
       username: '',
       email: '',
       nickname: '',
       user_id: 0,
-      setUserInfo: (userInfo) => set((prev) => ({ ...prev, ...userInfo })),
-      clearUserInfo: () => set({ username: '', email: '', nickname: '', user_id: 0 }),
+      is_active: false,
+      is_admin: false,
+      created_at: '',
+      updated_at: '',
+      
+      // 액션들
+      setUserInfo: (userInfo: Partial<UserState>) => set((prev) => ({ ...prev, ...userInfo })),
+      clearUserInfo: () => set({ 
+        username: '', 
+        email: '', 
+        nickname: '', 
+        user_id: 0,
+        is_active: false,
+        is_admin: false,
+        created_at: '',
+        updated_at: ''
+      }),
     }),
     {
       name: 'user-store',

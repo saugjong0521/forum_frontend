@@ -1,13 +1,10 @@
+// hooks/useBringPost.ts
 import { useCallback } from 'react';
 import { PATH } from '../constants/path';
 import { api } from '../api';
 import { useSessionTokenStore } from '../store/useSessionTokenStore';
 import { usePostStore } from '../store/usePostStore';
-
-interface GetPostParams {
-    post_id: number;    // 필수
-    password?: number;  // 선택사항
-}
+import { GetPostParams } from '../types/board';
 
 const useBringPost = () => {
     const {
@@ -67,7 +64,7 @@ const useBringPost = () => {
         } finally {
             setLoading(false);
         }
-    }, [setPost, setLoading, setError, token]); // post와 shouldRefetch 제거
+    }, [setPost, setLoading, setError, token]);
 
     // 상태 초기화 함수
     const resetPost = useCallback(() => {
