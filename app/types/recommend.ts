@@ -8,3 +8,4 @@ export interface RecommendState {
   recommendation_id?: number;
   created_at?: string;
 }
+

@@ -90,7 +90,7 @@ export interface RecentBoardType {
   titleMaxLength?: number; // 제목 최대 길이 (기본값: 15)
 }
 
-export interface BoardPostState {
+export interface BoardPostsState {
   // 게시판 설정
   currentBoardId: number | null;
   postsPerPage: number;
