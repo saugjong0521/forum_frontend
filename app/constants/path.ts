@@ -13,7 +13,8 @@ export const PATH = {
   DEACTIVATECOMMENT: (id: number) => `/posts/comments/${id}/deactivate`,
   POSTRECOMMEND: (id: number) => `/posts/${id}/recommend`,
   UNDORECOMMEND: (id: number) => `/posts/${id}/recommend`,
-  CHECKRECOMMEND: (id: number) => `/posts/${id}/recommend`
+  CHECKRECOMMEND: (id: number) => `/posts/${id}/recommend`,
+  CHECKUSERLIST: "/admin/users"
 } as const;
 
 
