@@ -24,21 +24,22 @@ export default function BoardComponent() {
     goToPrevPage,
     setSorting,
     resetBoard,
-    setBoardId
+    setBoardId,
+    setPostsPerPage  // 추가
   } = useBoardPostStore();
 
   // 게시판 목록 관련 store & hook
   const { getBoardName } = useBoardsStore();
   const { boards, bringBoardsName, loading: boardsLoading, error: boardsError } = useBringBoards();
 
-
-  // 컴포넌트 마운트 시 게시판 목록 가져오기
+  // 컴포넌트 마운트 시 일반 게시판용 10개로 설정 및 게시판 목록 가져오기
   useEffect(() => {
+    setPostsPerPage(10); // 일반 게시판은 10개로 고정
     bringBoardsName({
       skip: 0,
       limit: 100
     });
-  }, [bringBoardsName]);
+  }, [setPostsPerPage, bringBoardsName]);
 
   // URL에서 페이지 번호 읽어오기
   useEffect(() => {
