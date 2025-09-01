@@ -17,12 +17,14 @@ export const PATH = {
   CHECKUSERLIST: "/admin/users",
 
   ADMINDEACTIVATEPOST: (id: number) => `/admin/posts/${id}/deactivate`,
-  ADMINDEACTIVATECOMMENT: (id: number) => `/admin/posts/comments/${id}/deactivate`,
+  ADMINDEACTIVATECOMMENT: (id: number) => `/admin/comments/${id}/deactivate`,
   ADMINDELETEPOST: (id: number) => `/admin/posts/${id}`,
   ADMINDELETECOMMENT: (id: number) => `/admin/posts/comments/${id}`,
   ADMINACTIVATEPOST: (id: number) => `/admin/posts/${id}/activate`,
   ADMINGETCOMMENTS:  (id: number) => `/posts/${id}/comments`,
-  ADMINACTIVATECOMMENT: (id: number) => `/admin/comments/${id}/activate`
+  ADMINACTIVATECOMMENT: (id: number) => `/admin/comments/${id}/activate`,
+  ADMINCOMMENTS: `/admin/comments`,
+
 } as const;
 
 

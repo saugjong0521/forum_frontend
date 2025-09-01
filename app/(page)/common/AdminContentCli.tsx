@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import AdminBoardComponent from "@/app/components/admin/AdminBoardComponent";
 import AdminBoardDisplay from "@/app/components/admin/AdminBoardDisplay";
+import AdminCommentComponent from '@/app/components/admin/AdminCommentComponent';
 
 type TabType = 'board' | 'comment';
 
@@ -49,9 +50,7 @@ const ContentAdminClient = () => {
                 {activeTab === 'board' ? (
                     <AdminBoardComponent />
                 ) : (
-                    <div className="flex-1 bg-white border border-gray-300 rounded p-4">
-                        <div className="text-center text-gray-500">댓글 관리 영역 (준비중)</div>
-                    </div>
+                    <AdminCommentComponent />
                 )}
             </div>
 
