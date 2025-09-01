@@ -1,11 +1,11 @@
 'use client';
 
 import { usePostStore } from '@/app/store/usePostStore';
-
-
+import AdminCommentBox from './AdminCommentBox';
 
 const AdminBoardDisplay = () => {
   const { post: selectedPost } = usePostStore();
+  
   if (!selectedPost) {
     return (
       <div className="flex-1 bg-white border border-gray-300 rounded p-6 ml-4">
@@ -29,7 +29,7 @@ const AdminBoardDisplay = () => {
   };
 
   return (
-    <div className="flex-1 bg-white border border-gray-300 rounded p-6 ml-4">
+    <div className="flex-1 bg-white border border-gray-300 rounded p-6 ml-4 overflow-y-auto">
       {/* 게시글 헤더 */}
       <div className="border-b border-gray-200 pb-4 mb-6">
         <div className="flex items-center justify-between mb-2">
@@ -40,9 +40,17 @@ const AdminBoardDisplay = () => {
         <div className="flex items-center justify-between text-sm text-gray-600">
           <div className="flex items-center gap-4">
             <span className="font-medium">{selectedPost.author?.nickname || '익명'}</span>
+            <span>ID: {selectedPost.author_id}</span>
             <span>{formatDetailDate(selectedPost.created_at)}</span>
             <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
               {selectedPost.board?.name}
+            </span>
+            <span className={`px-2 py-1 text-xs rounded ${
+              selectedPost.is_active 
+                ? 'bg-green-100 text-green-600' 
+                : 'bg-red-100 text-red-600'
+            }`}>
+              {selectedPost.is_active ? '활성' : '비활성'}
             </span>
           </div>
           
@@ -56,7 +64,9 @@ const AdminBoardDisplay = () => {
       {/* 게시글 내용 */}
       <div className="prose max-w-none">
         <div 
-          className="text-gray-800 leading-relaxed"
+          className={`leading-relaxed ${
+            selectedPost.is_active ? 'text-gray-800' : 'text-gray-500'
+          }`}
           dangerouslySetInnerHTML={{ __html: selectedPost.content || '내용이 없습니다.' }}
         />
       </div>
@@ -86,6 +96,9 @@ const AdminBoardDisplay = () => {
           </div>
         </div>
       </div>
+
+      {/* 댓글 관리 영역 */}
+      <AdminCommentBox postId={selectedPost.post_id} />
     </div>
   );
 };
