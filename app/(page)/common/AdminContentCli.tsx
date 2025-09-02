@@ -20,14 +20,14 @@ const ContentAdminClient = () => {
     };
 
     return (
-        <>
+        <div className='w-full h-full flex gap-[20px]'>
             {/* 좌측 영역 */}
             <div className="w-1/2 h-full flex flex-col">
 
                 {/* 탭 버튼들 */}
-                <div className="flex h-full gap-[15px] p-2">
+                <div className="flex gap-[15px] p-0">
                     <button
-                        className={`px-4 rounded transition-colors ${activeTab === 'board'
+                        className={`px-4 rounded h-[25px] transition-colors ${activeTab === 'board'
                             ? 'bg-blue-500 text-white'
                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
@@ -36,7 +36,7 @@ const ContentAdminClient = () => {
                         <p>게시글</p>
                     </button>
                     <button
-                        className={`px-4 rounded transition-colors ${activeTab === 'comment'
+                        className={`px-4 h-[25px] rounded transition-colors ${activeTab === 'comment'
                             ? 'bg-blue-500 text-white'
                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
@@ -48,9 +48,13 @@ const ContentAdminClient = () => {
 
                 {/* 좌측 컨텐츠 */}
                 {activeTab === 'board' ? (
-                    <AdminBoardComponent />
+                    <div className="w-full h-full">
+                        <AdminBoardComponent />
+                    </div>
                 ) : (
-                    <AdminCommentComponent />
+                    <div className="">
+                        <AdminCommentComponent />
+                    </div>
                 )}
             </div>
 
@@ -64,7 +68,7 @@ const ContentAdminClient = () => {
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 };
 

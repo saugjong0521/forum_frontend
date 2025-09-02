@@ -100,21 +100,18 @@ export default function AdminCommentsAllBox() {
     return content.substring(0, maxLength) + '...';
   };
 
-  // 댓글 행의 스타일을 결정하는 함수
-  const getRowClassName = (comment: any) => {
-    let baseClasses = 'h-10 cursor-pointer transition-colors';
-    
-    // 비활성 댓글 스타일 (is_active: false)
-    if (!comment.is_active) {
-      baseClasses += ' bg-gray-100 hover:bg-gray-150';
-    }
-    // 일반 댓글 스타일
-    else {
-      baseClasses += ' hover:bg-gray-50';
-    }
-    
-    return baseClasses;
-  };
+const getRowClassName = (comment: any) => {
+  let baseClasses = 'cursor-pointer transition-colors'; // h-10 제거
+  
+  if (!comment.is_active) {
+    baseClasses += ' bg-gray-100 hover:bg-gray-150';
+  } else {
+    baseClasses += ' hover:bg-gray-50';
+  }
+  
+  return baseClasses;
+};
+
 
   // 텍스트 스타일을 결정하는 함수
   const getTextClassName = (comment: any, baseClass: string) => {
@@ -154,13 +151,13 @@ export default function AdminCommentsAllBox() {
       <table className="w-full text-sm">
         <thead className="bg-gray-50">
           <tr className="h-10">
-            <th className="px-2 text-left font-medium text-gray-700 border-b w-16">댓글ID</th>
-            <th className="px-2 text-left font-medium text-gray-700 border-b">내용</th>
-            <th className="px-2 text-center font-medium text-gray-700 border-b w-16">게시글ID</th>
-            <th className="px-2 text-center font-medium text-gray-700 border-b w-20">작성자</th>
-            <th className="px-2 text-center font-medium text-gray-700 border-b w-16">상태</th>
-            <th className="px-2 text-center font-medium text-gray-700 border-b w-20">작성일</th>
-            <th className="px-2 text-center font-medium text-gray-700 border-b w-20">관리</th>
+            <th className="px-2 h-[25px] text-left font-medium text-gray-700 border-b w-16">댓글ID</th>
+            <th className="px-2 h-[25px] text-left font-medium text-gray-700 border-b">내용</th>
+            <th className="px-2 h-[25px] text-center font-medium text-gray-700 border-b w-16">게시글ID</th>
+            <th className="px-2 h-[25px] text-center font-medium text-gray-700 border-b w-20">작성자</th>
+            <th className="px-2 h-[25px] text-center font-medium text-gray-700 border-b w-16">상태</th>
+            <th className="px-2 h-[25px] text-center font-medium text-gray-700 border-b w-20">작성일</th>
+            <th className="px-2 h-[25px] text-center font-medium text-gray-700 border-b w-20">관리</th>
           </tr>
         </thead>
         <tbody>
