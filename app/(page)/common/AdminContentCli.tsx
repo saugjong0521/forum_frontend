@@ -47,26 +47,15 @@ const ContentAdminClient = () => {
                 </div>
 
                 {/* 좌측 컨텐츠 */}
-                {activeTab === 'board' ? (
                     <div className="w-full h-full">
                         <AdminBoardComponent />
                     </div>
-                ) : (
-                    <div className="">
-                        <AdminCommentComponent />
-                    </div>
-                )}
+
             </div>
 
             {/* 우측 영역 */}
             <div className="w-1/2 h-full">
-                {activeTab === 'board' ? (
                     <AdminBoardDisplay />
-                ) : (
-                    <div className="h-full bg-white border border-gray-300 rounded p-4">
-                        <div className="text-center text-gray-500">댓글 상세 영역 (준비중)</div>
-                    </div>
-                )}
             </div>
         </div>
     );

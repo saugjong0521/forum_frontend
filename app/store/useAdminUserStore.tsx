@@ -1,13 +1,20 @@
-// store/useAdminCommentsStore.ts
+// store/useAdminUserStore.ts
 import { create } from 'zustand';
-import { Comment } from '../types/board';
 
-// is_active 필터 타입 정의
-type IsActiveFilter = boolean | null; // true(활성), false(비활성), null(전체)
+export interface User {
+  user_id: number;
+  username: string;
+  email: string;
+  nickname: string;
+  is_active: boolean;
+  is_admin: boolean;
+  created_at: string;
+}
 
-interface AdminCommentsState {
-  // 기본 상태
-  comments: Comment[];
+type IsActiveFilter = boolean | null;
+
+interface AdminUserState {
+  users: User[];
   loading: boolean;
   error: string | null;
   
@@ -17,18 +24,17 @@ interface AdminCommentsState {
   currentPage: number;
   hasNextPage: boolean;
   isActiveFilter: IsActiveFilter;
-  currentPostId: number | null;
   
   // 페이지네이션
   totalCount: number;
 }
 
-interface AdminCommentsActions {
+interface AdminUserActions {
   // 기본 Actions
-  setComments: (comments: Comment[]) => void;
-  addComment: (comment: Comment) => void;
-  updateComment: (commentId: number, updates: Partial<Comment>) => void;
-  removeComment: (commentId: number) => void;
+  setUsers: (users: User[]) => void;
+  addUser: (user: User) => void;
+  updateUser: (userId: number, updates: Partial<User>) => void;
+  removeUser: (userId: number) => void;
   
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -44,51 +50,49 @@ interface AdminCommentsActions {
   setCurrentSkip: (skip: number) => void;
   setCurrentLimit: (limit: number) => void;
   setIsActiveFilter: (isActive: IsActiveFilter) => void;
-  setCurrentPostId: (postId: number | null) => void;
   
   // 페이지네이션 정보 Actions
   setTotalCount: (count: number) => void;
   
   // 유틸리티
   reset: () => void;
-  clearComments: () => void;
+  clearUsers: () => void;
 }
 
-type AdminCommentsStore = AdminCommentsState & AdminCommentsActions;
+type AdminUserStore = AdminUserState & AdminUserActions;
 
-export const useAdminCommentsStore = create<AdminCommentsStore>((set, get) => ({
+export const useAdminUserStore = create<AdminUserStore>((set, get) => ({
   // 초기 상태
-  comments: [],
+  users: [],
   loading: false,
   error: null,
   
   // 필터링 초기 상태
   currentSkip: 0,
-  currentLimit: 20, // 관리자용은 20개로 기본값 변경
+  currentLimit: 20,
   currentPage: 1,
   hasNextPage: false,
-  isActiveFilter: null, // null = 전체, true = 활성, false = 비활성
-  currentPostId: null,
+  isActiveFilter: null,
   
   // 페이지네이션 초기 상태
   totalCount: 0,
   
   // Actions
-  setComments: (comments: Comment[]) => set({ comments }),
+  setUsers: (users: User[]) => set({ users }),
   
-  addComment: (comment: Comment) => set((state) => ({
-    comments: [comment, ...state.comments],
+  addUser: (user: User) => set((state) => ({
+    users: [user, ...state.users],
     totalCount: state.totalCount + 1,
   })),
   
-  updateComment: (commentId: number, updates: Partial<Comment>) => set((state) => ({
-    comments: state.comments.map((comment) =>
-      comment.comment_id === commentId ? { ...comment, ...updates } : comment
+  updateUser: (userId: number, updates: Partial<User>) => set((state) => ({
+    users: state.users.map((user) =>
+      user.user_id === userId ? { ...user, ...updates } : user
     ),
   })),
   
-  removeComment: (commentId: number) => set((state) => ({
-    comments: state.comments.filter((comment) => comment.comment_id !== commentId),
+  removeUser: (userId: number) => set((state) => ({
+    users: state.users.filter((user) => user.user_id !== userId),
     totalCount: Math.max(0, state.totalCount - 1),
   })),
   
@@ -142,31 +146,24 @@ export const useAdminCommentsStore = create<AdminCommentsStore>((set, get) => ({
     currentSkip: 0
   }),
   
-  setCurrentPostId: (postId: number | null) => set({
-    currentPostId: postId,
-    currentPage: 1,
-    currentSkip: 0
-  }),
-  
   // 페이지네이션 정보 Actions
   setTotalCount: (count: number) => set({ totalCount: count }),
   
   // 유틸리티
   reset: () => set({
-    comments: [],
+    users: [],
     loading: false,
     error: null,
     currentSkip: 0,
-    currentLimit: 30,
+    currentLimit: 20,
     currentPage: 1,
     hasNextPage: false,
     isActiveFilter: null,
-    currentPostId: null,
     totalCount: 0,
   }),
   
-  clearComments: () => set({
-    comments: [],
+  clearUsers: () => set({
+    users: [],
     totalCount: 0,
     hasNextPage: false,
   }),

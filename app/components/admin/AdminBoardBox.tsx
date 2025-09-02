@@ -176,7 +176,7 @@ export default function AdminBoardBox() {
             <th className="px-2 text-center font-medium text-gray-700 border-b w-16">상태</th>
             <th className="px-2 text-center font-medium text-gray-700 border-b w-12">조회</th>
             <th className="px-2 text-center font-medium text-gray-700 border-b w-16">작성일</th>
-            <th className="px-2 text-center font-medium text-gray-700 border-b w-16">관리</th>
+            <th className="px-2 text-center font-medium text-gray-700 border-b w-20">관리</th>
           </tr>
         </thead>
         <tbody>

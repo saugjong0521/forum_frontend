@@ -24,6 +24,7 @@ export const PATH = {
   ADMINGETCOMMENTS:  (id: number) => `/posts/${id}/comments`,
   ADMINACTIVATECOMMENT: (id: number) => `/admin/comments/${id}/activate`,
   ADMINCOMMENTS: `/admin/comments`,
+  ADMINGETUSERS: `/admin/users`,
 
 } as const;
 

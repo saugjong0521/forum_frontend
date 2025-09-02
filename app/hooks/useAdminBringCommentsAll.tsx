@@ -36,7 +36,7 @@ const useAdminBringCommentsAll = () => {
 
     const queryParams = {
       skip: params.skip || 0,
-      limit: params.limit || 20, // 기본값을 20으로 변경
+      limit: params.limit || 30, // 기본값을 20으로 변경
       ...(params.is_active !== null && params.is_active !== undefined && { is_active: params.is_active }),
       ...(params.post_id && { post_id: params.post_id }),
     };
