@@ -101,7 +101,7 @@ export default function AdminBoardComponent() {
   const handleIsActiveFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     let filterValue: boolean | null;
-    
+
     if (value === 'all') {
       filterValue = null;
     } else if (value === 'active') {
@@ -109,7 +109,7 @@ export default function AdminBoardComponent() {
     } else {
       filterValue = false;
     }
-    
+
     console.log('is_active 필터 변경:', { value, filterValue });
     setIsActiveFilter(filterValue);
   };

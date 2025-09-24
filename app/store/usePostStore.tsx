@@ -1,3 +1,4 @@
+
 // store/usePostStore.ts
 import { create } from 'zustand';
 import { Post } from '../types/board';
